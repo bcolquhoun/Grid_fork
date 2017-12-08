@@ -41,18 +41,18 @@ BEGIN_HADRONS_NAMESPACE
  ******************************************************************************/
 BEGIN_MODULE_NAMESPACE(MGauge)
 
-class LoadSmearPar: Serializable
+class LoadSmearPar : Serializable
 {
-public:
+  public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(LoadSmearPar,
                                     std::string, file,
-				    int, Nsmear,
-				    double, rho);
+                                    int, Nsmear,
+                                    double, rho);
 };
 
-class TLoadSmear: public Module<LoadSmearPar>
+class TLoadSmear : public Module<LoadSmearPar>
 {
-public:
+  public:
     // constructor
     TLoadSmear(const std::string name);
     // destructor
@@ -66,7 +66,7 @@ public:
     virtual void execute(void);
 };
 
-MODULE_REGISTER_NS(LoadsSmear, TLoadSmear, MGauge);
+MODULE_REGISTER_NS(LoadSmear, TLoadSmear, MGauge);
 
 END_MODULE_NAMESPACE
 

@@ -5,6 +5,7 @@ modules_cc =\
   Modules/MScalar/FreeProp.cc \
   Modules/MScalar/ChargedProp.cc \
   Modules/MGauge/Unit.cc \
+  Modules/MGauge/LoadSmear.cc \
   Modules/MGauge/Random.cc \
   Modules/MGauge/StochEm.cc \
   Modules/MGauge/Load.cc
@@ -35,5 +36,6 @@ modules_hpp =\
   Modules/MGauge/Unit.hpp \
   Modules/MGauge/Random.hpp \
   Modules/MGauge/Load.hpp \
+  Modules/MGauge/LoadSmear.hpp \
   Modules/MSink/Point.hpp
 

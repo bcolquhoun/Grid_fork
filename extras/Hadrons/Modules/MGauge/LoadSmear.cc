@@ -38,21 +38,22 @@ using namespace MGauge;
 ******************************************************************************/
 // constructor /////////////////////////////////////////////////////////////////
 TLoadSmear::TLoadSmear(const std::string name)
-: Module<LoadSmearPar>(name)
-{}
+    : Module<LoadSmearPar>(name)
+{
+}
 
 // dependencies/products ///////////////////////////////////////////////////////
 std::vector<std::string> TLoadSmear::getInput(void)
 {
     std::vector<std::string> in;
-    
+
     return in;
 }
 
 std::vector<std::string> TLoadSmear::getOutput(void)
 {
     std::vector<std::string> out = {getName()};
-    
+
     return out;
 }
 
@@ -65,29 +66,24 @@ void TLoadSmear::setup(void)
 // execution ///////////////////////////////////////////////////////////////////
 void TLoadSmear::execute(void)
 {
-    FieldMetaData  header;
-    std::string fileName = par().file + "."
-                           + std::to_string(env().getTrajectory());
-    
+    FieldMetaData header;
+    std::string fileName = par().file + "." + std::to_string(env().getTrajectory());
+
     LOG(Message) << "Loading NERSC configuration from file '" << fileName
                  << "'" << std::endl;
-    LatticeGaugeField U(*env().getGrid());
+    
+    GridCartesian *Ugrid = env().getGrid();
+    LatticeGaugeField U(Ugrid);
     NerscIO::readConfiguration(U, header, fileName);
     LOG(Message) << "NERSC header:" << std::endl;
     dump_meta_data(header, LOG(Message));
 
-
     // Smearing, assuming PeriodicGauge Implementation policy
     LOG(Message) << "Smearing configuration with Nsmear = " << par().Nsmear << " rho = " << par().rho
-		 << std::endl;
-    Smear_Stout<HMCWrapper::ImplPolicy> Stout(SmPar.rho);
-    SmearedConfiguration<PeriodicGimplR> SmearingPolicy(U._grid, par().Nsmear, Stout);
+                 << std::endl;
+    Smear_Stout<PeriodicGimplR> Stout(par().rho);
+    SmearedConfiguration<PeriodicGimplR> SmearingPolicy(Ugrid, par().Nsmear, Stout);
     SmearingPolicy.set_Field(U);
     LatticeGaugeField &SmearedU = *env().createLattice<LatticeGaugeField>(getName());
     SmearedU = SmearingPolicy.get_SmearedU();
-    
-    
-} else {
-  // no smearing
-  }
 }
