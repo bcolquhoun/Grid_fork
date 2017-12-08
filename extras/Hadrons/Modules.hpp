@@ -23,4 +23,5 @@
 #include <Grid/Hadrons/Modules/MGauge/Unit.hpp>
 #include <Grid/Hadrons/Modules/MGauge/Random.hpp>
 #include <Grid/Hadrons/Modules/MGauge/Load.hpp>
+#include <Grid/Hadrons/Modules/MGauge/LoadSmear.hpp>
 #include <Grid/Hadrons/Modules/MSink/Point.hpp>
