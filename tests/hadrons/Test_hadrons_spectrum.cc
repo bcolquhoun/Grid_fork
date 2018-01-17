@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
     
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
-    std::vector<std::string> flavour = {"b"};
-    std::vector<double>      mass    = {.68808};
-    std::vector<double>      tol     = {1e-16};
+    std::vector<std::string> flavour = {"l"};
+    std::vector<double>      mass    = {.019};
+    std::vector<double>      tol     = {1e-11};
     std::string srcName;
     std::string lapName;
     
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     globalPar.trajCounter.start = 1010;
     globalPar.trajCounter.end   = 1020;
     globalPar.trajCounter.step  = 10;
-    globalPar.seed              = "1 2 3 4";
+    globalPar.seed              = "0 1 2 3";
     application.setPar(globalPar);
 
     // gauge field
@@ -74,11 +74,11 @@ int main(int argc, char *argv[])
     ptPar.position = "0 0 0 0";
     application.createModule<MSource::Point>("pt", ptPar);
 
-    MSource::Z2:: Par z2Par;
-    z2Par.tA = 0;
-    z2Par.tB = 0;
-    srcName = "z2_";
-    application.createModule<MSource::Z2>(srcName, z2Par);
+    // MSource::Z2:: Par z2Par;
+    // z2Par.tA = 0;
+    // z2Par.tB = 0;
+    // srcName = "z2_";
+    // application.createModule<MSource::Z2>(srcName, z2Par);
 
     // MSource::LaplaceSmearing::Par LapPar;
     // LapPar.N = 20;
@@ -91,12 +91,12 @@ int main(int argc, char *argv[])
     // sink
     MSink::Point::Par sinkPar;
     sinkPar.mom = "0 0 0";
-    application.createModule<MSink::ScalarPoint>("sink", sinkPar);
+    application.createModule<MSink::Point>("sink", sinkPar);
     
     // set fermion boundary conditions to be periodic space, antiperiodic time.
     std::string boundary = "1 1 1 1";
     // set source - smear the b
-    std::vector<std::string> smearing = {"z2smr"}; 
+    // std::vector<std::string> smearing = {"z2smr"}; 
 
     for (unsigned int i = 0; i < flavour.size() ; ++i)
     {
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         actionPar.Ls    = 12;
         actionPar.M5    = 1.0;
         actionPar.mass  = mass[i];
-	actionPar.scale = 3.0;
+	actionPar.scale = 2.0;
         actionPar.boundary = boundary;
         application.createModule<MAction::MDWF>("MDWF_" + flavour[i], actionPar);
         
@@ -121,11 +121,11 @@ int main(int argc, char *argv[])
         MFermion::GaugeProp::Par quarkPar;
         quarkPar.solver = "CG_" + flavour[i];
 	if (flavour[i]=="s") {
-	    quarkPar.source = srcName;
+	    quarkPar.source = "pt";
 	  }
 	else
 	  {
-	    quarkPar.source = srcName;
+	    quarkPar.source = "pt";
 	  }
         application.createModule<MFermion::GaugeProp>("Qpt_" + flavour[i], quarkPar);
     }

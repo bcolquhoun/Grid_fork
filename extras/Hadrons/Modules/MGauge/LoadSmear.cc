@@ -78,6 +78,9 @@ void TLoadSmear::execute(void)
     LOG(Message) << "NERSC header:" << std::endl;
     dump_meta_data(header, LOG(Message));
 
+    RealD plaq = WilsonLoops<PeriodicGimplR>::avgPlaquette(U);
+    LOG(Message) << "Average thin plaquette: " << plaq << std::endl;
+
     // Smearing, assuming PeriodicGauge Implementation policy
     LOG(Message) << "Smearing configuration with Nsmear = " << par().Nsmear << " rho = " << par().rho
                  << std::endl;
@@ -86,4 +89,7 @@ void TLoadSmear::execute(void)
     SmearingPolicy.set_Field(U);
     LatticeGaugeField &SmearedU = *env().createLattice<LatticeGaugeField>(getName());
     SmearedU = SmearingPolicy.get_SmearedU();
+    RealD sm_plaq = WilsonLoops<PeriodicGimplR>::avgPlaquette(SmearedU);
+    LOG(Message) << "Average Stout smeared plaquette: " << sm_plaq << std::endl;
+    
 }
