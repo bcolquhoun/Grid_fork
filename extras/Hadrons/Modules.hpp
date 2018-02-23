@@ -21,6 +21,7 @@
 #include <Grid/Hadrons/Modules/MGauge/Load.hpp>
 #include <Grid/Hadrons/Modules/MGauge/Random.hpp>
 #include <Grid/Hadrons/Modules/MGauge/StochEm.hpp>
+#include <Grid/Hadrons/Modules/MGauge/LoadSmear.hpp>
 #include <Grid/Hadrons/Modules/MContraction/WeakHamiltonian.hpp>
 #include <Grid/Hadrons/Modules/MContraction/WeakHamiltonianNonEye.hpp>
 #include <Grid/Hadrons/Modules/MContraction/Baryon.hpp>

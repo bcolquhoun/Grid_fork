@@ -1,6 +1,7 @@
 modules_cc =\
   Modules/MScalar/FreeProp.cc \
   Modules/MScalar/ChargedProp.cc \
+  Modules/MGauge/LoadSmear.cc \
   Modules/MGauge/FundtoHirep.cc \
   Modules/MGauge/Random.cc \
   Modules/MGauge/Unit.cc \
@@ -35,6 +36,7 @@ modules_hpp =\
   Modules/MGauge/Load.hpp \
   Modules/MGauge/Random.hpp \
   Modules/MGauge/StochEm.hpp \
+  Modules/MGauge/LoadSmear.hpp \
   Modules/MContraction/WeakHamiltonian.hpp \
   Modules/MContraction/WeakHamiltonianNonEye.hpp \
   Modules/MContraction/Baryon.hpp \
