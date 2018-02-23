@@ -30,6 +30,7 @@ modules_hpp =\
   Modules/MAction/WilsonClover.hpp \
   Modules/MAction/DWF.hpp \
   Modules/MAction/Wilson.hpp \
+  Modules/MAction/MobiusDWF.hpp \
   Modules/MSolver/RBPrecCG.hpp \
   Modules/MGauge/Unit.hpp \
   Modules/MGauge/FundtoHirep.hpp \

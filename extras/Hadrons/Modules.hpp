@@ -15,6 +15,7 @@
 #include <Grid/Hadrons/Modules/MAction/WilsonClover.hpp>
 #include <Grid/Hadrons/Modules/MAction/DWF.hpp>
 #include <Grid/Hadrons/Modules/MAction/Wilson.hpp>
+#include <Grid/Hadrons/Modules/MAction/MobiusDWF.hpp>
 #include <Grid/Hadrons/Modules/MSolver/RBPrecCG.hpp>
 #include <Grid/Hadrons/Modules/MGauge/Unit.hpp>
 #include <Grid/Hadrons/Modules/MGauge/FundtoHirep.hpp>
