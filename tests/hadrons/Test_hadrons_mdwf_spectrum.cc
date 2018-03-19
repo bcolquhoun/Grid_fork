@@ -43,23 +43,26 @@ int main(int argc, char *argv[])
     
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
-    // std::vector<std::string> flavour = {"l", "s", "c1", "c2", "c3"};
-    // std::vector<double>      mass    = {.01, .04, .2  , .25 , .3  };
-
     std::vector<std::string> flavour = {"b"};
-    std::vector<double>      mass    = {.8};
+    std::vector<double>      mass    = {.019};
+    std::vector<double>      tol     = {1e-11};
+    std::string srcName;
+    std::string lapName;
     
     // global parameters
     Application::GlobalPar globalPar;
-    // globalPar.trajCounter.start = 1500;
-    // globalPar.trajCounter.end   = 1520;
     globalPar.trajCounter.start = 1010;
     globalPar.trajCounter.end   = 1020;
-    globalPar.trajCounter.step  = 20;
+    globalPar.trajCounter.step  = 10;
     globalPar.seed              = "1 2 3 4";
     application.setPar(globalPar);
+
     // gauge field
     application.createModule<MGauge::Random>("gauge");
+    // MGauge::Load::Par LPar;
+    // LPar.file = "myfile";
+    // application.createModule<MGauge::Load>("gauge",LPar);
+
     // MGauge::LoadSmear::Par LPar;
     // LPar.file = "myfile";
     // LPar.Nsmear = 3;
@@ -67,49 +70,67 @@ int main(int argc, char *argv[])
     // application.createModule<MGauge::LoadSmear>("gauge",LPar);
 
     // sources
-    // MSource::Z2::Par z2Par;
-    // z2Par.tA = 0;
-    // z2Par.tB = 0;
-    // application.createModule<MSource::Z2>("z2", z2Par);
     MSource::Point::Par ptPar;
     ptPar.position = "0 0 0 0";
     application.createModule<MSource::Point>("pt", ptPar);
+
+    // MSource::Z2:: Par z2Par;
+    // z2Par.tA = 0;
+    // z2Par.tB = 0;
+    // srcName = "z2_";
+    // application.createModule<MSource::Z2>(srcName, z2Par);
+
+    // MSource::LaplaceSmearing::Par LapPar;
+    // LapPar.N = 20;
+    // LapPar.alpha = 0.1;
+    // LapPar.source = srcName;
+    // LapPar.gauge = "gauge";
+    // lapName= "z2smr_";
+    // application.createModule<MSource::LaplaceSmearing>(lapName,LapPar);
+    
     // sink
     MSink::Point::Par sinkPar;
     sinkPar.mom = "0 0 0";
     application.createModule<MSink::ScalarPoint>("sink", sinkPar);
+ 
     
     // set fermion boundary conditions to be periodic space, antiperiodic time.
-    std::string boundary = "1 1 1 -1";
+    std::string boundary = "1 1 1 1";
+    // set source - smear the b
+    // std::vector<std::string> smearing = {"z2smr"}; 
 
-    for (unsigned int i = 0; i < flavour.size(); ++i)
+    for (unsigned int i = 0; i < flavour.size() ; ++i)
     {
         // actions
         MAction::DWF::Par actionPar;
         actionPar.gauge = "gauge";
         actionPar.Ls    = 12;
-        //actionPar.M5    = 1.8;
-	actionPar.M5    = 1.0;
+        actionPar.M5    = 1.0;
         actionPar.mass  = mass[i];
+	//actionPar.scale = 2.0;
         actionPar.boundary = boundary;
-        application.createModule<MAction::DWF>("DWF_" + flavour[i], actionPar);
+        application.createModule<MAction::DWF>("MDWF_" + flavour[i], actionPar);
         
         // solvers
         MSolver::RBPrecCG::Par solverPar;
-        solverPar.action   = "DWF_" + flavour[i];
-        //solverPar.residual = 1.0e-8;
-	solverPar.residual = 1.0e-16;
+        solverPar.action   = "MDWF_" + flavour[i];
+	solverPar.residual = tol[i];
         application.createModule<MSolver::RBPrecCG>("CG_" + flavour[i],
                                                     solverPar);
         
         // propagators
         MFermion::GaugeProp::Par quarkPar;
         quarkPar.solver = "CG_" + flavour[i];
-        quarkPar.source = "pt";
+	if (flavour[i]=="s") {
+	    quarkPar.source = "pt";
+	  }
+	else
+	  {
+	    quarkPar.source = "pt";
+	  }
         application.createModule<MFermion::GaugeProp>("Qpt_" + flavour[i], quarkPar);
-        // quarkPar.source = "z2";
-        // application.createModule<MFermion::GaugeProp>("QZ2_" + flavour[i], quarkPar);
     }
+
     for (unsigned int i = 0; i < flavour.size(); ++i)
     for (unsigned int j = i; j < flavour.size(); ++j)
     {
@@ -123,29 +144,9 @@ int main(int argc, char *argv[])
         application.createModule<MContraction::Meson>("meson_pt_"
                                                       + flavour[i] + flavour[j],
                                                       mesPar);
-        // mesPar.output  = "mesons/Z2_" + flavour[i] + flavour[j];
-        // mesPar.q1      = "QZ2_" + flavour[i];
-        // mesPar.q2      = "QZ2_" + flavour[j];
-        // mesPar.gammas  = "all";
-        // mesPar.sink    = "sink";
-        // application.createModule<MContraction::Meson>("meson_Z2_"
-        //                                               + flavour[i] + flavour[j],
-        //                                               mesPar);
+	
     }
-    // for (unsigned int i = 0; i < flavour.size(); ++i)
-    // for (unsigned int j = i; j < flavour.size(); ++j)
-    // for (unsigned int k = j; k < flavour.size(); ++k)
-    // {
-    //     MContraction::Baryon::Par barPar;
-        
-    //     barPar.output = "baryons/pt_" + flavour[i] + flavour[j] + flavour[k];
-    //     barPar.q1     = "Qpt_" + flavour[i];
-    //     barPar.q2     = "Qpt_" + flavour[j];
-    //     barPar.q3     = "Qpt_" + flavour[k];
-    //     application.createModule<MContraction::Baryon>(
-    //         "baryon_pt_" + flavour[i] + flavour[j] + flavour[k], barPar);
-    // }
-    
+
     // execution
     application.saveParameterFile("spectrum.xml");
     application.run();

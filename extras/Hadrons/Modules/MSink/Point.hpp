@@ -127,18 +127,30 @@ void TPoint<FImpl>::execute(void)
 
         envGetTmp(LatticeComplex, coor);
         p  = strToVec<Real>(par().mom);
+	std::vector<LatticeComplex> saved_coor;
         ph = zero;
         for(unsigned int mu = 0; mu < env().getNd(); mu++)
         {
             LatticeCoordinate(coor, mu);
+	    std::cout << "mu: " << mu << "  p[mu]: " << p[mu] << std::endl ;
+	    saved_coor.push_back(coor) ;
+	    //std::cout << "coor: " << coor << std::endl ; 
+	    std::cout << "fdimensions[mu]: " << env().getGrid()->_fdimensions[mu] << std::endl ; 
             ph = ph + (p[mu]/env().getGrid()->_fdimensions[mu])*coor;
         }
+	std::cout << "ph (before exp): " << ph << std::endl ; 
         ph = exp((Real)(2*M_PI)*i*ph);
+	std::cout << "saved_coor[0] " << saved_coor[0] << std::endl ; 
+	std::cout << "saved_coor[1] " << saved_coor[1] << std::endl ; 
+	std::cout << "saved_coor[2] " << saved_coor[2] << std::endl ; 
+	std::cout << "saved_coor[3] " << saved_coor[3] << std::endl ; 
+
         hasPhase_ = true;
     }
     auto sink = [&ph](const PropagatorField &field)
     {
         SlicedPropagator res;
+	std::cout << "ph: " << ph << std::endl ; 
         PropagatorField  tmp = ph*field;
         
         sliceSum(tmp, res, Tp);

@@ -146,6 +146,11 @@ void TGaugeProp<FImpl>::execute(void)
     auto        &prop    = envGet(PropagatorField, propName);
     auto        &fullSrc = envGet(PropagatorField, par().source);
     auto        &solver  = envGet(SolverFn, par().solver);
+
+    auto actionMod = vm().getModule<MSolver::RBPrecCG>(par().solver);
+
+    auto &mat  = envGet(FMat, actionMod->par().action);
+
     
     envGetTmp(FermionField, source);
     envGetTmp(FermionField, sol);

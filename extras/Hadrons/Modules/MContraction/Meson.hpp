@@ -234,7 +234,8 @@ void TMeson<FImpl1, FImpl2>::execute(void)
             }
             for (unsigned int t = 0; t < buf.size(); ++t)
             {
-                result[i].corr[t] = TensorRemove(buf[t]);
+	      std::cout << "buffer " << t << " " << buf[t] << std::endl;
+	      result[i].corr[t] = TensorRemove(buf[t]);
             }
         }
     }
