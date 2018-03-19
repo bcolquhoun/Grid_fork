@@ -399,5 +399,12 @@ void *SharedMemory::ShmBufferTranslate(int rank,void * local_p)
     return (void *) remote;
   }
 }
+SharedMemory::~SharedMemory()
+{
+  int MPI_is_finalised;  MPI_Finalized(&MPI_is_finalised);
+  if ( !MPI_is_finalised ) { 
+    MPI_Comm_free(&ShmComm);
+  }
+};
 
 }

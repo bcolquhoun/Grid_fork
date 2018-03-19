@@ -31,6 +31,7 @@ Author: paboyle <paboyle@ph.ed.ac.uk>
 
 namespace Grid { 
 
+
 struct LanczosParams : Serializable {
  public:
   GRID_SERIALIZABLE_CLASS_MEMBERS(LanczosParams,
@@ -240,21 +241,6 @@ private:
   std::vector<CoarseField>                        _evec_coarse;
 
 public:
-  static void Deflate(std::vector<FineField>   subspace,
-		      std::vector<CoarseField> evec_coarse,
-		      std::vector<RealD>       eval_coarse,
-		      const FineField& src_orig,FineField& result) 
-  {
-    int N = (int)evec_coarse.size();
-    CoarseField src_coarse(evec_coarse[0]._grid);
-    CoarseField res_coarse(evec_coarse[0]._grid);    res_coarse = zero;
-    blockProject(src_orig,src_coarse,subspace);    
-    for (int i=0;i<N;i++) {
-      CoarseField & tmp = evec_coarse[i];
-      axpy(res_coarse,TensorRemove(innerProduct(tmp,src_coarse)) / eval_coarse[i],tmp,res_coarse);
-    }
-    blockPromote(res_coarse,result,subspace);
-  };
 
   LocalCoherenceLanczos(GridBase *FineGrid,
 			GridBase *CoarseGrid,
@@ -346,7 +332,7 @@ public:
     // create a smoother and see if we can get a cheap convergence test and smooth inside the IRL
     //////////////////////////////////////////////////////////////////////////////////////////////////
     Chebyshev<FineField>                          ChebySmooth(cheby_smooth);
-    ProjectedFunctionHermOp<Fobj,CComplex,nbasis> ChebyOp (ChebySmooth,_FineOp,_subspace);
+    ProjectedFunctionHermOp<Fobj,CComplex,nbasis> ChebyOp (ChebySmooth,_FineOp,subspace);
     ImplicitlyRestartedLanczosSmoothedTester<Fobj,CComplex,nbasis> ChebySmoothTester(ChebyOp,ChebySmooth,_FineOp,subspace,relax);
 
     for(int k=0;k<evec_coarse.size();k++){
@@ -387,14 +373,14 @@ public:
 		  RealD MaxIt, RealD betastp, int MinRes)
   {
     Chebyshev<FineField>                          Cheby(cheby_op);
-    ProjectedHermOp<Fobj,CComplex,nbasis>         Op(_FineOp,_subspace);
-    ProjectedFunctionHermOp<Fobj,CComplex,nbasis> ChebyOp (Cheby,_FineOp,_subspace);
+    ProjectedHermOp<Fobj,CComplex,nbasis>         Op(_FineOp,subspace);
+    ProjectedFunctionHermOp<Fobj,CComplex,nbasis> ChebyOp (Cheby,_FineOp,subspace);
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // create a smoother and see if we can get a cheap convergence test and smooth inside the IRL
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     Chebyshev<FineField>                                           ChebySmooth(cheby_smooth);
-    ImplicitlyRestartedLanczosSmoothedTester<Fobj,CComplex,nbasis> ChebySmoothTester(ChebyOp,ChebySmooth,_FineOp,_subspace,relax);
+    ImplicitlyRestartedLanczosSmoothedTester<Fobj,CComplex,nbasis> ChebySmoothTester(ChebyOp,ChebySmooth,_FineOp,subspace,relax);
 
     evals_coarse.resize(Nm);
     evec_coarse.resize(Nm,_CoarseGrid);
