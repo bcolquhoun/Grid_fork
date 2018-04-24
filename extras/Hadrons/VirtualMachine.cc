@@ -250,6 +250,11 @@ std::string VirtualMachine::getModuleNamespace(const std::string name) const
     return getModuleNamespace(getModuleAddress(name));
 }
 
+int VirtualMachine::getCurrentModule(void) const
+{
+    return currentModule_;
+}
+
 bool VirtualMachine::hasModule(const unsigned int address) const
 {
     return (address < module_.size());
@@ -301,9 +306,10 @@ void VirtualMachine::makeModuleGraph(void)
 
             if (min < 0)
             {
-                HADRON_ERROR(Definition, "object with address " 
-                             + std::to_string(in) 
-                             + " is not produced by any module");
+                HADRON_ERROR(Definition, "dependency '" 
+                             + env().getObjectName(in) + "' (address " 
+                             + std::to_string(in)
+                             + ") is not produced by any module");
             }
             else
             {
@@ -468,7 +474,9 @@ void VirtualMachine::memoryProfile(const unsigned int address)
                << "' (" << address << ")..." << std::endl;
     try
     {
+        currentModule_ = address;
         m->setup();
+        currentModule_ = -1;
         updateProfile(address);
     }
     catch (Exceptions::Definition &)
@@ -622,7 +630,7 @@ VirtualMachine::Program VirtualMachine::schedule(const GeneticPar &par)
 #define SEP     "---------------"
 #define MEM_MSG(size) sizeString(size)
 
-void VirtualMachine::executeProgram(const Program &p) const
+void VirtualMachine::executeProgram(const Program &p)
 {
     Size            memPeak = 0, sizeBefore, sizeAfter;
     GarbageSchedule freeProg;
@@ -650,7 +658,9 @@ void VirtualMachine::executeProgram(const Program &p) const
         LOG(Message) << SEP << " Measurement step " << i + 1 << "/"
                      << p.size() << " (module '" << module_[p[i]].name
                      << "') " << SEP << std::endl;
+        currentModule_ = p[i];
         (*module_[p[i]].data)();
+        currentModule_ = -1;
         sizeBefore = env().getTotalSize();
         // print used memory after execution
         LOG(Message) << "Allocated objects: " << MEM_MSG(sizeBefore)
@@ -679,7 +689,7 @@ void VirtualMachine::executeProgram(const Program &p) const
     }
 }
 
-void VirtualMachine::executeProgram(const std::vector<std::string> &p) const
+void VirtualMachine::executeProgram(const std::vector<std::string> &p)
 {
     Program pAddress;
     
