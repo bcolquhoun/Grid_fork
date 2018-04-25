@@ -2,7 +2,7 @@
 
 Grid physics library, www.github.com/paboyle/Grid 
 
-Source file: extras/Hadrons/Modules/MScalarSUN/TrPhi.hpp
+Source file: extras/Hadrons/Modules/MScalarSUN/Grad.hpp
 
 Copyright (C) 2015-2018
 
@@ -25,8 +25,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 See the full license in the file "LICENSE" in the top level distribution directory
 *************************************************************************************/
 /*  END LEGAL */
-#ifndef Hadrons_MScalarSUN_TrPhi_hpp_
-#define Hadrons_MScalarSUN_TrPhi_hpp_
+#ifndef Hadrons_MScalarSUN_Grad_hpp_
+#define Hadrons_MScalarSUN_Grad_hpp_
 
 #include <Grid/Hadrons/Global.hpp>
 #include <Grid/Hadrons/Module.hpp>
@@ -36,21 +36,21 @@ See the full license in the file "LICENSE" in the top level distribution directo
 BEGIN_HADRONS_NAMESPACE
 
 /******************************************************************************
- *                      Trace of powers of a scalar field                     *
+ *                       Gradient of a complex field                          *
  ******************************************************************************/
 BEGIN_MODULE_NAMESPACE(MScalarSUN)
 
-class TrPhiPar: Serializable
+class GradPar: Serializable
 {
 public:
-    GRID_SERIALIZABLE_CLASS_MEMBERS(TrPhiPar,
-                                    std::string,  field,
-                                    unsigned int, maxPow,
-                                    std::string,  output);
+    GRID_SERIALIZABLE_CLASS_MEMBERS(GradPar,
+                                    std::string, op,
+                                    DiffType,    type,
+                                    std::string, output);
 };
 
 template <typename SImpl>
-class TTrPhi: public Module<TrPhiPar>
+class TGrad: public Module<GradPar>
 {
 public:
     typedef typename SImpl::Field        Field;
@@ -59,14 +59,14 @@ public:
     {
     public:
         GRID_SERIALIZABLE_CLASS_MEMBERS(Result,
-                                        std::string, op,
-                                        Real,        value);
+                                        DiffType, type,
+                                        Complex,  value);
     };
 public:
     // constructor
-    TTrPhi(const std::string name);
+    TGrad(const std::string name);
     // destructor
-    virtual ~TTrPhi(void) {};
+    virtual ~TGrad(void) {};
     // dependency relation
     virtual std::vector<std::string> getInput(void);
     virtual std::vector<std::string> getOutput(void);
@@ -76,91 +76,85 @@ public:
     virtual void execute(void);
 };
 
-MODULE_REGISTER_TMP(TrPhiSU2, TTrPhi<ScalarNxNAdjImplR<2>>, MScalarSUN);
-MODULE_REGISTER_TMP(TrPhiSU3, TTrPhi<ScalarNxNAdjImplR<3>>, MScalarSUN);
-MODULE_REGISTER_TMP(TrPhiSU4, TTrPhi<ScalarNxNAdjImplR<4>>, MScalarSUN);
-MODULE_REGISTER_TMP(TrPhiSU5, TTrPhi<ScalarNxNAdjImplR<5>>, MScalarSUN);
-MODULE_REGISTER_TMP(TrPhiSU6, TTrPhi<ScalarNxNAdjImplR<6>>, MScalarSUN);
+MODULE_REGISTER_TMP(GradSU2, TGrad<ScalarNxNAdjImplR<2>>, MScalarSUN);
+MODULE_REGISTER_TMP(GradSU3, TGrad<ScalarNxNAdjImplR<3>>, MScalarSUN);
+MODULE_REGISTER_TMP(GradSU4, TGrad<ScalarNxNAdjImplR<4>>, MScalarSUN);
+MODULE_REGISTER_TMP(GradSU5, TGrad<ScalarNxNAdjImplR<5>>, MScalarSUN);
+MODULE_REGISTER_TMP(GradSU6, TGrad<ScalarNxNAdjImplR<6>>, MScalarSUN);
 
 /******************************************************************************
- *                          TTrPhi implementation                             *
+ *                         TGrad implementation                               *
  ******************************************************************************/
 // constructor /////////////////////////////////////////////////////////////////
 template <typename SImpl>
-TTrPhi<SImpl>::TTrPhi(const std::string name)
-: Module<TrPhiPar>(name)
+TGrad<SImpl>::TGrad(const std::string name)
+: Module<GradPar>(name)
 {}
 
 // dependencies/products ///////////////////////////////////////////////////////
 template <typename SImpl>
-std::vector<std::string> TTrPhi<SImpl>::getInput(void)
+std::vector<std::string> TGrad<SImpl>::getInput(void)
 {
-    std::vector<std::string> in = {par().field};
+    std::vector<std::string> in = {par().op};
     
     return in;
 }
 
 template <typename SImpl>
-std::vector<std::string> TTrPhi<SImpl>::getOutput(void)
+std::vector<std::string> TGrad<SImpl>::getOutput(void)
 {
     std::vector<std::string> out;
+    const auto               nd = env().getNd();
 
-    for (unsigned int n = 2; n <= par().maxPow; n += 2)
+    for (unsigned int mu = 0; mu < nd; ++mu)
     {
-        out.push_back(varName(getName(), n));
+        out.push_back(varName(getName(), mu));
     }
-    
+
     return out;
 }
 
 // setup ///////////////////////////////////////////////////////////////////////
 template <typename SImpl>
-void TTrPhi<SImpl>::setup(void)
+void TGrad<SImpl>::setup(void)
 {
-    if (par().maxPow < 2)
+    const auto nd = env().getNd();
+
+    for (unsigned int mu = 0; mu < nd; ++mu)
     {
-        HADRON_ERROR(Size, "'maxPow' should be at least equal to 2");
-    }
-    envTmpLat(Field, "phi2");
-    envTmpLat(Field, "buf");
-    for (unsigned int n = 2; n <= par().maxPow; n += 2)
-    {
-        envCreateLat(ComplexField, varName(getName(), n));
+        envCreateLat(ComplexField, varName(getName(), mu));
     }
 }
 
 // execution ///////////////////////////////////////////////////////////////////
 template <typename SImpl>
-void TTrPhi<SImpl>::execute(void)
+void TGrad<SImpl>::execute(void)
 {
-    LOG(Message) << "Computing tr(phi^n) for n even up to " << par().maxPow
-                 << std::endl; 
+    const auto nd = env().getNd();
+
+    LOG(Message) << "Computing the " << par().type << " gradient of '"
+                 << par().op << "'" << std::endl;
 
     std::vector<Result> result;
-    auto                &phi = envGet(Field, par().field);
+    auto                &op = envGet(ComplexField, par().op);
 
-    envGetTmp(Field, phi2);
-    envGetTmp(Field, buf);
-    buf  = 1.;
-    phi2 = -phi*phi; 
-    for (unsigned int n = 2; n <= par().maxPow; n += 2)
+    for (unsigned int mu = 0; mu < nd; ++mu)
     {
-        auto &phin = envGet(ComplexField, varName(getName(), n));
+        auto &der = envGet(ComplexField, varName(getName(), mu));
 
-        buf  = buf*phi2;
-        phin = trace(buf);
+        dmu(der, op, mu, par().type);
         if (!par().output.empty())
         {
             Result r;
 
-            r.op    = "tr(phi^" + std::to_string(n) + ")";
-            r.value = TensorRemove(sum(phin)).real();
+            r.type  = par().type;
+            r.value = TensorRemove(sum(der));
             result.push_back(r);
         }
     }
     if (result.size() > 0)
     {
-        saveResult(par().output, "trphi", result);
+        saveResult(par().output, "grad", result);
     }
 }
 
@@ -168,4 +162,4 @@ END_MODULE_NAMESPACE
 
 END_HADRONS_NAMESPACE
 
-#endif // Hadrons_MScalarSUN_TrPhi_hpp_
+#endif // Hadrons_MScalarSUN_Grad_hpp_

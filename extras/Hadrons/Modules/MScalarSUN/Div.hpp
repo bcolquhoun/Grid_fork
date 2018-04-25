@@ -66,7 +66,7 @@ public:
     // constructor
     TDiv(const std::string name);
     // destructor
-    virtual ~TDiv(void) = default;
+    virtual ~TDiv(void) {};
     // dependency relation
     virtual std::vector<std::string> getInput(void);
     virtual std::vector<std::string> getOutput(void);
@@ -126,7 +126,7 @@ void TDiv<SImpl>::execute(void)
     LOG(Message) << "Computing the " << par().type << " divergence of [";
     for (unsigned int mu = 0; mu < nd; ++mu)
     {
-        std::cout << par().op[mu] << ((mu == nd - 1) ? "]" : ", ");
+        std::cout << "'" << par().op[mu] << ((mu == nd - 1) ? "']" : "', ");
     }
     std::cout << std::endl;
 

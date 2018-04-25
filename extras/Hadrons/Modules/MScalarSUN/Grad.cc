@@ -2,7 +2,7 @@
 
 Grid physics library, www.github.com/paboyle/Grid 
 
-Source file: extras/Hadrons/Modules/MGauge/Random.hpp
+Source file: extras/Hadrons/Modules/MScalarSUN/Grad.cc
 
 Copyright (C) 2015-2018
 
@@ -25,42 +25,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 See the full license in the file "LICENSE" in the top level distribution directory
 *************************************************************************************/
 /*  END LEGAL */
+#include <Grid/Hadrons/Modules/MScalarSUN/Grad.hpp>
 
-#ifndef Hadrons_MGauge_Random_hpp_
-#define Hadrons_MGauge_Random_hpp_
+using namespace Grid;
+using namespace Hadrons;
+using namespace MScalarSUN;
 
-#include <Grid/Hadrons/Global.hpp>
-#include <Grid/Hadrons/Module.hpp>
-#include <Grid/Hadrons/ModuleFactory.hpp>
-
-BEGIN_HADRONS_NAMESPACE
-
-/******************************************************************************
- *                             Random gauge                                   *
- ******************************************************************************/
-BEGIN_MODULE_NAMESPACE(MGauge)
-
-class TRandom: public Module<NoPar>
-{
-public:
-    // constructor
-    TRandom(const std::string name);
-    // destructor
-    virtual ~TRandom(void) {};
-    // dependency relation
-    virtual std::vector<std::string> getInput(void);
-    virtual std::vector<std::string> getOutput(void);
-protected:
-    // setup
-    virtual void setup(void);
-    // execution
-    virtual void execute(void);
-};
-
-MODULE_REGISTER(Random, TRandom, MGauge);
-
-END_MODULE_NAMESPACE
-
-END_HADRONS_NAMESPACE
-
-#endif // Hadrons_MGauge_Random_hpp_
+template class Grid::Hadrons::MScalarSUN::TGrad<ScalarNxNAdjImplR<2>>;
+template class Grid::Hadrons::MScalarSUN::TGrad<ScalarNxNAdjImplR<3>>;
+template class Grid::Hadrons::MScalarSUN::TGrad<ScalarNxNAdjImplR<4>>;
+template class Grid::Hadrons::MScalarSUN::TGrad<ScalarNxNAdjImplR<5>>;
+template class Grid::Hadrons::MScalarSUN::TGrad<ScalarNxNAdjImplR<6>>;
