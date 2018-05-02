@@ -56,11 +56,14 @@ class TLoadCoarseEigenPack: public Module<LoadCoarseEigenPackPar>
 {
 public:
     typedef CoarseEigenPack<typename Pack::Field, typename Pack::CoarseField> BasePack;
+    template <typename vtype> 
+    using iImplScalar = iScalar<iScalar<iScalar<vtype>>>;
+    typedef iImplScalar<typename Pack::Field::vector_type> SiteComplex;
 public:
     // constructor
     TLoadCoarseEigenPack(const std::string name);
     // destructor
-    virtual ~TLoadCoarseEigenPack(void) = default;
+    virtual ~TLoadCoarseEigenPack(void) {};
     // dependency relation
     virtual std::vector<std::string> getInput(void);
     virtual std::vector<std::string> getOutput(void);
@@ -70,8 +73,7 @@ public:
     virtual void execute(void);
 };
 
-MODULE_REGISTER_NS(LoadCoarseFermionEigenPack, 
-    ARG(TLoadCoarseEigenPack<CoarseFermionEigenPack<FIMPL, HADRONS_DEFAULT_LANCZOS_NBASIS>>), MIO);
+MODULE_REGISTER_TMP(LoadCoarseFermionEigenPack, ARG(TLoadCoarseEigenPack<CoarseFermionEigenPack<FIMPL, HADRONS_DEFAULT_LANCZOS_NBASIS>>), MIO);
 
 /******************************************************************************
  *                 TLoadCoarseEigenPack implementation                             *
@@ -114,9 +116,15 @@ void TLoadCoarseEigenPack<Pack>::setup(void)
 template <typename Pack>
 void TLoadCoarseEigenPack<Pack>::execute(void)
 {
-    auto &epack = envGetDerived(BasePack, Pack, getName());
+    auto                 cg     = env().getCoarseGrid(par().blockSize, par().Ls);
+    auto                 &epack = envGetDerived(BasePack, Pack, getName());
+    Lattice<SiteComplex> dummy(cg);
 
     epack.read(par().filestem, vm().getTrajectory());
+    LOG(Message) << "Block Gramm-Schmidt pass 1"<< std::endl;
+    blockOrthogonalise(dummy, epack.evec);
+    LOG(Message) << "Block Gramm-Schmidt pass 2"<< std::endl;
+    blockOrthogonalise(dummy, epack.evec);
 }
 
 END_MODULE_NAMESPACE

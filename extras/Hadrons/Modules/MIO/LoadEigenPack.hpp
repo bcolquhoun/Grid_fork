@@ -58,7 +58,7 @@ public:
     // constructor
     TLoadEigenPack(const std::string name);
     // destructor
-    virtual ~TLoadEigenPack(void) = default;
+    virtual ~TLoadEigenPack(void) {};
     // dependency relation
     virtual std::vector<std::string> getInput(void);
     virtual std::vector<std::string> getOutput(void);
@@ -68,7 +68,7 @@ public:
     virtual void execute(void);
 };
 
-MODULE_REGISTER_NS(LoadFermionEigenPack, TLoadEigenPack<FermionEigenPack<FIMPL>>, MIO);
+MODULE_REGISTER_TMP(LoadFermionEigenPack, TLoadEigenPack<FermionEigenPack<FIMPL>>, MIO);
 
 /******************************************************************************
  *                    TLoadEigenPack implementation                           *
@@ -112,6 +112,7 @@ void TLoadEigenPack<Pack>::execute(void)
     auto &epack = envGetDerived(BasePack, Pack, getName());
 
     epack.read(par().filestem, vm().getTrajectory());
+    epack.eval.resize(par().size);
 }
 
 END_MODULE_NAMESPACE
