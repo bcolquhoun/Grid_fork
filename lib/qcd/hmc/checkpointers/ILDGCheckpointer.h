@@ -95,6 +95,10 @@ class ILDGHmcCheckpointer : public BaseHmcCheckpointer<Implementation> {
                          GridParallelRNG &pRNG) {
     std::string config, rng;
     this->build_filenames(traj, Params, config, rng);
+    this->check_filename(rng);
+    this->check_filename(config);
+
+    
 
     uint32_t nersc_csum,scidac_csuma,scidac_csumb;
     BinaryIO::readRNG(sRNG, pRNG, rng, 0,nersc_csum,scidac_csuma,scidac_csumb);

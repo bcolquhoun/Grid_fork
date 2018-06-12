@@ -120,14 +120,9 @@ envTmp(type, name, Ls, env().getGrid(Ls))
 MACRO_REDIRECT(__VA_ARGS__, envTmpLat5, envTmpLat4)(__VA_ARGS__)
 
 #define saveResult(ioStem, name, result)\
-if (env().getGrid()->IsBoss())\
+if (env().getGrid()->IsBoss() and !ioStem.empty())\
 {\
-    std::string _dirname = dirname(ioStem);\
-    \
-    if (mkdir(_dirname))\
-    {\
-        HADRON_ERROR(Io, "cannot create directory '" + _dirname + "'");\
-    }\
+    makeFileDir(ioStem, env().getGrid());\
     {\
         ResultWriter _writer(RESULT_FILE_NAME(ioStem));\
         write(_writer, name, result);\

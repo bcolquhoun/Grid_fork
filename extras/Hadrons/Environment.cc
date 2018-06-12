@@ -35,7 +35,7 @@ using namespace QCD;
 using namespace Hadrons;
 
 #define ERROR_NO_ADDRESS(address)\
-HADRON_ERROR(Definition, "no object with address " + std::to_string(address));
+HADRONS_ERROR(Definition, "no object with address " + std::to_string(address));
 
 /******************************************************************************
  *                       Environment implementation                           *
@@ -49,11 +49,10 @@ Environment::Environment(void)
         dim_, GridDefaultSimd(nd_, vComplex::Nsimd()),
         GridDefaultMpi()));
     gridRb4d_.reset(SpaceTimeGrid::makeFourDimRedBlackGrid(grid4d_.get()));
-    auto loc = getGrid()->LocalDimensions();
-    locVol_ = 1;
-    for (unsigned int d = 0; d < loc.size(); ++d)
+    vol_ = 1.;
+    for (auto d: dim_)
     {
-        locVol_ *= loc[d];
+        vol_ *= d;
     }
     rng4d_.reset(new GridParallelRNG(grid4d_.get()));
 }
@@ -85,7 +84,7 @@ void Environment::createCoarseGrid(const std::vector<int> &blockSize,
         coarseDim[d] = fineDim[d]/blockSize[d];
         if (coarseDim[d]*blockSize[d] != fineDim[d])
         {
-            HADRON_ERROR(Size, "Fine dimension " + std::to_string(d) 
+            HADRONS_ERROR(Size, "Fine dimension " + std::to_string(d) 
                          + " (" + std::to_string(fineDim[d]) 
                          + ") not divisible by coarse dimension ("
                          + std::to_string(coarseDim[d]) + ")"); 
@@ -96,7 +95,7 @@ void Environment::createCoarseGrid(const std::vector<int> &blockSize,
         cLs = Ls/blockSize[nd];
         if (cLs*blockSize[nd] != Ls)
         {
-            HADRON_ERROR(Size, "Fine Ls (" + std::to_string(Ls) 
+            HADRONS_ERROR(Size, "Fine Ls (" + std::to_string(Ls) 
                          + ") not divisible by coarse Ls ("
                          + std::to_string(cLs) + ")");
         }
@@ -128,7 +127,7 @@ GridCartesian * Environment::getGrid(const unsigned int Ls) const
     }
     catch(std::out_of_range &)
     {
-        HADRON_ERROR(Definition, "no grid with Ls= " + std::to_string(Ls));
+        HADRONS_ERROR(Definition, "no grid with Ls= " + std::to_string(Ls));
     }
 }
 
@@ -147,7 +146,7 @@ GridRedBlackCartesian * Environment::getRbGrid(const unsigned int Ls) const
     }
     catch(std::out_of_range &)
     {
-        HADRON_ERROR(Definition, "no red-black grid with Ls= " + std::to_string(Ls));
+        HADRONS_ERROR(Definition, "no red-black grid with Ls= " + std::to_string(Ls));
     }
 }
 
@@ -171,7 +170,7 @@ GridCartesian * Environment::getCoarseGrid(
     }
     catch(std::out_of_range &)
     {
-        HADRON_ERROR(Definition, "no coarse grid with Ls= " + std::to_string(Ls));
+        HADRONS_ERROR(Definition, "no coarse grid with Ls= " + std::to_string(Ls));
     }
 }
 
@@ -190,9 +189,9 @@ int Environment::getDim(const unsigned int mu) const
     return dim_[mu];
 }
 
-unsigned long int Environment::getLocalVolume(void) const
+double Environment::getVolume(void) const
 {
-    return locVol_;
+    return vol_;
 }
 
 // random number generator /////////////////////////////////////////////////////
@@ -221,7 +220,7 @@ void Environment::addObject(const std::string name, const int moduleAddress)
     }
     else
     {
-        HADRON_ERROR(Definition, "object '" + name + "' already exists");
+        HADRONS_ERROR(Definition, "object '" + name + "' already exists");
     }
 }
 
@@ -244,7 +243,7 @@ unsigned int Environment::getObjectAddress(const std::string name) const
     }
     else
     {
-        HADRON_ERROR(Definition, "no object with name '" + name + "'");
+        HADRONS_ERROR(Definition, "no object with name '" + name + "'");
     }
 }
 

@@ -7,6 +7,7 @@ Source file: extras/Hadrons/Modules/MGauge/StochEm.cc
 Copyright (C) 2015-2018
 
 Author: Antonin Portelli <antonin.portelli@me.com>
+Author: James Harrison <j.harrison@soton.ac.uk>
 Author: Vera Guelpers <vmg1n14@soton.ac.uk>
 
 This program is free software; you can redistribute it and/or modify
@@ -58,12 +59,8 @@ std::vector<std::string> TStochEm::getOutput(void)
 // setup ///////////////////////////////////////////////////////////////////////
 void TStochEm::setup(void)
 {
-    create_weight = false; 
-    if (!env().hasCreatedObject("_" + getName() + "_weight"))
-    {
-        envCacheLat(EmComp, "_" + getName() + "_weight");
-        create_weight = true;
-    }
+    weightDone_ = env().hasCreatedObject("_" + getName() + "_weight");
+    envCacheLat(EmComp, "_" + getName() + "_weight");
     envCreateLat(EmField, getName());
 }
 
@@ -72,13 +69,14 @@ void TStochEm::execute(void)
 {
     LOG(Message) << "Generating stochastic EM potential..." << std::endl;
 
-    PhotonR photon(par().gauge, par().zmScheme);
+    std::vector<Real> improvements = strToVec<Real>(par().improvement);
+    PhotonR photon(par().gauge, par().zmScheme, improvements, par().G0_qedInf);
     auto    &a = envGet(EmField, getName());
     auto    &w = envGet(EmComp, "_" + getName() + "_weight");
     
-    if (create_weight)
+    if (!weightDone_)
     {
-        LOG(Message) << "Caching stochatic EM potential weight (gauge: "
+        LOG(Message) << "Caching stochastic EM potential weight (gauge: "
                      << par().gauge << ", zero-mode scheme: "
                      << par().zmScheme << ")..." << std::endl;
         photon.StochasticWeight(w);

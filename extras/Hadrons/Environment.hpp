@@ -94,8 +94,8 @@ public:
                                           const unsigned int Ls = 1) const;
     std::vector<int>        getDim(void) const;
     int                     getDim(const unsigned int mu) const;
-    unsigned long int       getLocalVolume(void) const;
     unsigned int            getNd(void) const;
+    double                  getVolume(void) const;
     // random number generator
     void                    setSeed(const std::vector<int> &seed);
     GridParallelRNG *       get4dRng(void) const;
@@ -155,7 +155,7 @@ public:
     void                    printContent(void) const;
 private:
     // general
-    unsigned long int                      locVol_;
+    double                                 vol_;
     bool                                   protect_{true};
     // grids
     std::vector<int>                       dim_;
@@ -245,7 +245,7 @@ void Environment::createDerivedObject(const std::string name,
              (object_[address].type        != &typeid(B))     or
              (object_[address].derivedType != &typeid(T)))
     {
-        HADRON_ERROR(Definition, "object '" + name + "' already allocated");
+        HADRONS_ERROR(Definition, "object '" + name + "' already allocated");
     }
 }
 
@@ -279,7 +279,7 @@ T * Environment::getDerivedObject(const unsigned int address) const
                     }
                     else
                     {
-                        HADRON_ERROR(Definition, "object with address " + std::to_string(address) +
+                        HADRONS_ERROR(Definition, "object with address " + std::to_string(address) +
                             " cannot be casted to '" + typeName(&typeid(T)) +
                             "' (has type '" + typeName(&typeid(h->get())) + "')");
                     }
@@ -287,20 +287,20 @@ T * Environment::getDerivedObject(const unsigned int address) const
             }
             else
             {
-                HADRON_ERROR(Definition, "object with address " + std::to_string(address) +
+                HADRONS_ERROR(Definition, "object with address " + std::to_string(address) +
                             " does not have type '" + typeName(&typeid(B)) +
                             "' (has type '" + getObjectType(address) + "')");
             }
         }
         else
         {
-            HADRON_ERROR(Definition, "object with address " + std::to_string(address) +
+            HADRONS_ERROR(Definition, "object with address " + std::to_string(address) +
                          " is empty");
         }
     }
     else
     {
-        HADRON_ERROR(Definition, "no object with address " + std::to_string(address));
+        HADRONS_ERROR(Definition, "no object with address " + std::to_string(address));
     }
 }
 
@@ -338,7 +338,7 @@ bool Environment::isObjectOfType(const unsigned int address) const
     }
     else
     {
-        HADRON_ERROR(Definition, "no object with address " + std::to_string(address));
+        HADRONS_ERROR(Definition, "no object with address " + std::to_string(address));
     }
 }
 
