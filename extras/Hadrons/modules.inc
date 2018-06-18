@@ -1,109 +1,111 @@
 modules_cc =\
-  Modules/MContraction/WeakHamiltonianEye.cc \
-  Modules/MContraction/Baryon.cc \
-  Modules/MContraction/Meson.cc \
-  Modules/MContraction/WeakNeutral4ptDisc.cc \
-  Modules/MContraction/WeakHamiltonianNonEye.cc \
-  Modules/MContraction/WardIdentity.cc \
-  Modules/MContraction/DiscLoop.cc \
-  Modules/MContraction/Gamma3pt.cc \
-  Modules/MFermion/FreeProp.cc \
-  Modules/MFermion/GaugeProp.cc \
-  Modules/MSource/Point.cc \
-  Modules/MSource/Wall.cc \
-  Modules/MSource/SeqConserved.cc \
-  Modules/MSource/SeqGamma.cc \
-  Modules/MSource/Z2.cc \
-  Modules/MSink/Point.cc \
-  Modules/MSink/Smear.cc \
-  Modules/MSolver/RBPrecCG.cc \
-  Modules/MSolver/LocalCoherenceLanczos.cc \
-  Modules/MGauge/Unit.cc \
-  Modules/MGauge/UnitEm.cc \
-  Modules/MGauge/StochEm.cc \
-  Modules/MGauge/Random.cc \
-  Modules/MGauge/FundtoHirep.cc \
-  Modules/MUtilities/TestSeqGamma.cc \
-  Modules/MUtilities/TestSeqConserved.cc \
-  Modules/MLoop/NoiseLoop.cc \
-  Modules/MScalar/FreeProp.cc \
-  Modules/MScalar/ChargedProp.cc \
-  Modules/MScalar/ScalarVP.cc \
-  Modules/MScalar/VPCounterTerms.cc \
-  Modules/MAction/Wilson.cc \
-  Modules/MAction/ZMobiusDWF.cc \
-  Modules/MAction/WilsonClover.cc \
-  Modules/MAction/DWF.cc \
+  Modules/MScalarSUN/StochFreeField.cc \
+  Modules/MScalarSUN/TwoPointNPR.cc \
   Modules/MScalarSUN/TrPhi.cc \
   Modules/MScalarSUN/Grad.cc \
+  Modules/MScalarSUN/EMT.cc \
+  Modules/MScalarSUN/TwoPoint.cc \
+  Modules/MScalarSUN/ShiftProbe.cc \
+  Modules/MScalarSUN/TransProj.cc \
   Modules/MScalarSUN/TimeMomProbe.cc \
   Modules/MScalarSUN/TrMag.cc \
   Modules/MScalarSUN/TrKinetic.cc \
-  Modules/MScalarSUN/EMT.cc \
-  Modules/MScalarSUN/ShiftProbe.cc \
-  Modules/MScalarSUN/TransProj.cc \
-  Modules/MScalarSUN/StochFreeField.cc \
-  Modules/MScalarSUN/TwoPoint.cc \
-  Modules/MScalarSUN/TwoPointNPR.cc \
   Modules/MScalarSUN/Div.cc \
+  Modules/MContraction/WeakNeutral4ptDisc.cc \
+  Modules/MContraction/WardIdentity.cc \
+  Modules/MContraction/Gamma3pt.cc \
+  Modules/MContraction/Baryon.cc \
+  Modules/MContraction/DiscLoop.cc \
+  Modules/MContraction/WeakHamiltonianEye.cc \
+  Modules/MContraction/WeakHamiltonianNonEye.cc \
+  Modules/MContraction/Meson.cc \
+  Modules/MGauge/StochEm.cc \
+  Modules/MGauge/UnitEm.cc \
+  Modules/MGauge/LoadSmear.cc \
+  Modules/MGauge/Random.cc \
+  Modules/MGauge/Unit.cc \
+  Modules/MGauge/FundtoHirep.cc \
+  Modules/MSink/Smear.cc \
+  Modules/MSink/Point.cc \
+  Modules/MScalar/VPCounterTerms.cc \
+  Modules/MScalar/FreeProp.cc \
+  Modules/MScalar/ScalarVP.cc \
+  Modules/MScalar/ChargedProp.cc \
   Modules/MIO/LoadEigenPack.cc \
-  Modules/MIO/LoadBinary.cc \
+  Modules/MIO/LoadCoarseEigenPack.cc \
   Modules/MIO/LoadNersc.cc \
-  Modules/MIO/LoadCoarseEigenPack.cc
+  Modules/MIO/LoadBinary.cc \
+  Modules/MAction/ZMobiusDWF.cc \
+  Modules/MAction/DWF.cc \
+  Modules/MAction/WilsonClover.cc \
+  Modules/MAction/Wilson.cc \
+  Modules/MLoop/NoiseLoop.cc \
+  Modules/MSource/Z2.cc \
+  Modules/MSource/Wall.cc \
+  Modules/MSource/SeqGamma.cc \
+  Modules/MSource/Point.cc \
+  Modules/MSource/SeqConserved.cc \
+  Modules/MFermion/FreeProp.cc \
+  Modules/MFermion/GaugeProp.cc \
+  Modules/MUtilities/TestSeqGamma.cc \
+  Modules/MUtilities/TestSeqConserved.cc \
+  Modules/MSolver/RBPrecCG.cc \
+  Modules/MSolver/LocalCoherenceLanczos.cc
 
 modules_hpp =\
-  Modules/MContraction/Baryon.hpp \
-  Modules/MContraction/Meson.hpp \
-  Modules/MContraction/WeakHamiltonian.hpp \
-  Modules/MContraction/WeakHamiltonianNonEye.hpp \
-  Modules/MContraction/DiscLoop.hpp \
-  Modules/MContraction/WeakNeutral4ptDisc.hpp \
-  Modules/MContraction/Gamma3pt.hpp \
-  Modules/MContraction/WardIdentity.hpp \
-  Modules/MContraction/WeakHamiltonianEye.hpp \
-  Modules/MFermion/FreeProp.hpp \
-  Modules/MFermion/GaugeProp.hpp \
-  Modules/MSource/SeqGamma.hpp \
-  Modules/MSource/Point.hpp \
-  Modules/MSource/Wall.hpp \
-  Modules/MSource/Z2.hpp \
-  Modules/MSource/SeqConserved.hpp \
-  Modules/MSink/Smear.hpp \
-  Modules/MSink/Point.hpp \
-  Modules/MSolver/LocalCoherenceLanczos.hpp \
-  Modules/MSolver/RBPrecCG.hpp \
-  Modules/MGauge/Random.hpp \
-  Modules/MGauge/FundtoHirep.hpp \
-  Modules/MGauge/StochEm.hpp \
-  Modules/MGauge/Unit.hpp \
-  Modules/MGauge/UnitEm.hpp \
-  Modules/MUtilities/TestSeqGamma.hpp \
-  Modules/MUtilities/TestSeqConserved.hpp \
-  Modules/MLoop/NoiseLoop.hpp \
-  Modules/MScalar/ChargedProp.hpp \
-  Modules/MScalar/FreeProp.hpp \
-  Modules/MScalar/Scalar.hpp \
-  Modules/MScalar/ScalarVP.hpp \
-  Modules/MScalar/VPCounterTerms.hpp \
-  Modules/MAction/DWF.hpp \
-  Modules/MAction/Wilson.hpp \
-  Modules/MAction/WilsonClover.hpp \
-  Modules/MAction/ZMobiusDWF.hpp \
-  Modules/MScalarSUN/StochFreeField.hpp \
-  Modules/MScalarSUN/TwoPointNPR.hpp \
-  Modules/MScalarSUN/ShiftProbe.hpp \
-  Modules/MScalarSUN/Div.hpp \
-  Modules/MScalarSUN/TimeMomProbe.hpp \
-  Modules/MScalarSUN/TrMag.hpp \
-  Modules/MScalarSUN/EMT.hpp \
-  Modules/MScalarSUN/TwoPoint.hpp \
-  Modules/MScalarSUN/TrPhi.hpp \
   Modules/MScalarSUN/Utils.hpp \
-  Modules/MScalarSUN/TransProj.hpp \
   Modules/MScalarSUN/Grad.hpp \
   Modules/MScalarSUN/TrKinetic.hpp \
+  Modules/MScalarSUN/StochFreeField.hpp \
+  Modules/MScalarSUN/EMT.hpp \
+  Modules/MScalarSUN/TwoPointNPR.hpp \
+  Modules/MScalarSUN/TrPhi.hpp \
+  Modules/MScalarSUN/ShiftProbe.hpp \
+  Modules/MScalarSUN/TrMag.hpp \
+  Modules/MScalarSUN/Div.hpp \
+  Modules/MScalarSUN/TwoPoint.hpp \
+  Modules/MScalarSUN/TimeMomProbe.hpp \
+  Modules/MScalarSUN/TransProj.hpp \
+  Modules/MContraction/Gamma3pt.hpp \
+  Modules/MContraction/WeakHamiltonianNonEye.hpp \
+  Modules/MContraction/WardIdentity.hpp \
+  Modules/MContraction/WeakHamiltonianEye.hpp \
+  Modules/MContraction/WeakHamiltonian.hpp \
+  Modules/MContraction/DiscLoop.hpp \
+  Modules/MContraction/Meson.hpp \
+  Modules/MContraction/Baryon.hpp \
+  Modules/MContraction/WeakNeutral4ptDisc.hpp \
+  Modules/MGauge/Unit.hpp \
+  Modules/MGauge/FundtoHirep.hpp \
+  Modules/MGauge/UnitEm.hpp \
+  Modules/MGauge/LoadSmear.hpp \
+  Modules/MGauge/Random.hpp \
+  Modules/MGauge/StochEm.hpp \
+  Modules/MSink/Smear.hpp \
+  Modules/MSink/Point.hpp \
+  Modules/MScalar/FreeProp.hpp \
+  Modules/MScalar/ChargedProp.hpp \
+  Modules/MScalar/VPCounterTerms.hpp \
+  Modules/MScalar/ScalarVP.hpp \
+  Modules/MScalar/Scalar.hpp \
   Modules/MIO/LoadEigenPack.hpp \
   Modules/MIO/LoadNersc.hpp \
   Modules/MIO/LoadCoarseEigenPack.hpp \
-  Modules/MIO/LoadBinary.hpp
+  Modules/MIO/LoadBinary.hpp \
+  Modules/MAction/ZMobiusDWF.hpp \
+  Modules/MAction/WilsonClover.hpp \
+  Modules/MAction/DWF.hpp \
+  Modules/MAction/Wilson.hpp \
+  Modules/MLoop/NoiseLoop.hpp \
+  Modules/MSource/Wall.hpp \
+  Modules/MSource/Z2.hpp \
+  Modules/MSource/SeqConserved.hpp \
+  Modules/MSource/Point.hpp \
+  Modules/MSource/SeqGamma.hpp \
+  Modules/MFermion/FreeProp.hpp \
+  Modules/MFermion/GaugeProp.hpp \
+  Modules/MUtilities/TestSeqConserved.hpp \
+  Modules/MUtilities/TestSeqGamma.hpp \
+  Modules/MSolver/RBPrecCG.hpp \
+  Modules/MSolver/LocalCoherenceLanczos.hpp
 
