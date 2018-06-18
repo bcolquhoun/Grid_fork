@@ -38,6 +38,7 @@ modules_cc =\
   Modules/MAction/ZMobiusDWF.cc \
   Modules/MAction/DWF.cc \
   Modules/MAction/WilsonClover.cc \
+  Modules/MAction/MobiusDWF.cc \
   Modules/MAction/Wilson.cc \
   Modules/MLoop/NoiseLoop.cc \
   Modules/MSource/Z2.cc \
@@ -93,6 +94,7 @@ modules_hpp =\
   Modules/MIO/LoadCoarseEigenPack.hpp \
   Modules/MIO/LoadBinary.hpp \
   Modules/MAction/ZMobiusDWF.hpp \
+  Modules/MAction/MobiusDWF.hpp \
   Modules/MAction/WilsonClover.hpp \
   Modules/MAction/DWF.hpp \
   Modules/MAction/Wilson.hpp \

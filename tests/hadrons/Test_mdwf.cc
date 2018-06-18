@@ -44,8 +44,9 @@ int main(int argc, char *argv[])
     
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
-    std::vector<std::string> flavour = {"l", "s", "c1", "c2", "c3"};
-    std::vector<double>      mass    = {.01, .04, .2  , .25 , .3  };
+    std::vector<std::string> flavour = {"l","b"};
+    std::vector<double>      mass    = {0.019, .68808  };
+    std::vector<double>      tol     = {1e-11, 1e-16 };
     
     // global parameters
     Application::GlobalPar globalPar;
@@ -66,32 +67,33 @@ int main(int argc, char *argv[])
     z2Par.tA = 0;
     z2Par.tB = 0;
     application.createModule<MSource::Z2>("z2", z2Par);
-    MSource::Point::Par ptPar;
-    ptPar.position = "0 0 0 0";
-    application.createModule<MSource::Point>("pt", ptPar);
+    // MSource::Point::Par ptPar;
+    // ptPar.position = "0 0 0 0";
+    // application.createModule<MSource::Point>("pt", ptPar);
     // sink
     MSink::Point::Par sinkPar;
     sinkPar.mom = "0 0 0";
     application.createModule<MSink::ScalarPoint>("sink", sinkPar);
     
     // set fermion boundary conditions to be periodic space, antiperiodic time.
-    std::string boundary = "1 1 1 -1";
+    std::string boundary = "1 1 1 1";
 
     for (unsigned int i = 0; i < flavour.size(); ++i)
     {
         // actions
-        MAction::DWF::Par actionPar;
+        MAction::MobiusDWF::Par actionPar;
         actionPar.gauge = "gauge";
         actionPar.Ls    = 12;
-        actionPar.M5    = 1.8;
+        actionPar.M5    = 1.0;
         actionPar.mass  = mass[i];
+	actionPar.scale = 2.0;
         actionPar.boundary = boundary;
-        application.createModule<MAction::DWF>("DWF_" + flavour[i], actionPar);
+        application.createModule<MAction::MobiusDWF>("DWF_" + flavour[i], actionPar);
         
         // solvers
         MSolver::RBPrecCG::Par solverPar;
         solverPar.action       = "DWF_" + flavour[i];
-        solverPar.residual     = 1.0e-8;
+        solverPar.residual     = tol[i];
         solverPar.maxIteration = 10000;
         application.createModule<MSolver::RBPrecCG>("CG_" + flavour[i],
                                                     solverPar);
@@ -99,8 +101,8 @@ int main(int argc, char *argv[])
         // propagators
         MFermion::GaugeProp::Par quarkPar;
         quarkPar.solver = "CG_" + flavour[i];
-        quarkPar.source = "pt";
-        application.createModule<MFermion::GaugeProp>("Qpt_" + flavour[i], quarkPar);
+        // quarkPar.source = "pt";
+        // application.createModule<MFermion::GaugeProp>("Qpt_" + flavour[i], quarkPar);
         quarkPar.source = "z2";
         application.createModule<MFermion::GaugeProp>("QZ2_" + flavour[i], quarkPar);
     }
@@ -109,14 +111,14 @@ int main(int argc, char *argv[])
     {
         MContraction::Meson::Par mesPar;
         
-        mesPar.output  = "mesons/pt_" + flavour[i] + flavour[j];
-        mesPar.q1      = "Qpt_" + flavour[i];
-        mesPar.q2      = "Qpt_" + flavour[j];
-        mesPar.gammas  = "all";
-        mesPar.sink    = "sink";
-        application.createModule<MContraction::Meson>("meson_pt_"
-                                                      + flavour[i] + flavour[j],
-                                                      mesPar);
+        // mesPar.output  = "mesons/pt_" + flavour[i] + flavour[j];
+        // mesPar.q1      = "Qpt_" + flavour[i];
+        // mesPar.q2      = "Qpt_" + flavour[j];
+        // mesPar.gammas  = "all";
+        // mesPar.sink    = "sink";
+        // application.createModule<MContraction::Meson>("meson_pt_"
+        //                                               + flavour[i] + flavour[j],
+        //                                               mesPar);
         mesPar.output  = "mesons/Z2_" + flavour[i] + flavour[j];
         mesPar.q1      = "QZ2_" + flavour[i];
         mesPar.q2      = "QZ2_" + flavour[j];
@@ -126,19 +128,19 @@ int main(int argc, char *argv[])
                                                       + flavour[i] + flavour[j],
                                                       mesPar);
     }
-    for (unsigned int i = 0; i < flavour.size(); ++i)
-    for (unsigned int j = i; j < flavour.size(); ++j)
-    for (unsigned int k = j; k < flavour.size(); ++k)
-    {
-        MContraction::Baryon::Par barPar;
+    // for (unsigned int i = 0; i < flavour.size(); ++i)
+    // for (unsigned int j = i; j < flavour.size(); ++j)
+    // for (unsigned int k = j; k < flavour.size(); ++k)
+    // {
+    //     MContraction::Baryon::Par barPar;
         
-        barPar.output = "baryons/pt_" + flavour[i] + flavour[j] + flavour[k];
-        barPar.q1     = "Qpt_" + flavour[i];
-        barPar.q2     = "Qpt_" + flavour[j];
-        barPar.q3     = "Qpt_" + flavour[k];
-        application.createModule<MContraction::Baryon>(
-            "baryon_pt_" + flavour[i] + flavour[j] + flavour[k], barPar);
-    }
+    //     barPar.output = "baryons/pt_" + flavour[i] + flavour[j] + flavour[k];
+    //     barPar.q1     = "Qpt_" + flavour[i];
+    //     barPar.q2     = "Qpt_" + flavour[j];
+    //     barPar.q3     = "Qpt_" + flavour[k];
+    //     application.createModule<MContraction::Baryon>(
+    //         "baryon_pt_" + flavour[i] + flavour[j] + flavour[k], barPar);
+    // }
     
     // execution
     application.saveParameterFile("spectrum.xml");

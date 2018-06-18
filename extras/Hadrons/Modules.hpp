@@ -38,6 +38,7 @@
 #include <Grid/Hadrons/Modules/MIO/LoadCoarseEigenPack.hpp>
 #include <Grid/Hadrons/Modules/MIO/LoadBinary.hpp>
 #include <Grid/Hadrons/Modules/MAction/ZMobiusDWF.hpp>
+#include <Grid/Hadrons/Modules/MAction/MobiusDWF.hpp>
 #include <Grid/Hadrons/Modules/MAction/WilsonClover.hpp>
 #include <Grid/Hadrons/Modules/MAction/DWF.hpp>
 #include <Grid/Hadrons/Modules/MAction/Wilson.hpp>
