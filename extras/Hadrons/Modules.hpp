@@ -44,6 +44,7 @@
 #include <Grid/Hadrons/Modules/MAction/Wilson.hpp>
 #include <Grid/Hadrons/Modules/MLoop/NoiseLoop.hpp>
 #include <Grid/Hadrons/Modules/MSource/Wall.hpp>
+#include <Grid/Hadrons/Modules/MSource/FermionSmear.hpp>
 #include <Grid/Hadrons/Modules/MSource/Z2.hpp>
 #include <Grid/Hadrons/Modules/MSource/SeqConserved.hpp>
 #include <Grid/Hadrons/Modules/MSource/Point.hpp>

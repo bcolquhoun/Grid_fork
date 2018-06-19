@@ -41,6 +41,7 @@ modules_cc =\
   Modules/MAction/MobiusDWF.cc \
   Modules/MAction/Wilson.cc \
   Modules/MLoop/NoiseLoop.cc \
+  Modules/MSource/FermionSmear.cc \
   Modules/MSource/Z2.cc \
   Modules/MSource/Wall.cc \
   Modules/MSource/SeqGamma.cc \
@@ -100,6 +101,7 @@ modules_hpp =\
   Modules/MAction/Wilson.hpp \
   Modules/MLoop/NoiseLoop.hpp \
   Modules/MSource/Wall.hpp \
+  Modules/MSource/FermionSmear.hpp \
   Modules/MSource/Z2.hpp \
   Modules/MSource/SeqConserved.hpp \
   Modules/MSource/Point.hpp \
