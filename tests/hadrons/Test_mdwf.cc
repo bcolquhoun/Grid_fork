@@ -61,12 +61,22 @@ int main(int argc, char *argv[])
     LPar.Nsmear=3;
     LPar.rho=0.1;
     
-    application.createModule<MGauge::LoadSmear>("gauge",LPar);
+    //application.createModule<MGauge::LoadSmear>("gauge",LPar);
+    application.createModule<MGauge::Random>("gauge");
     // sources
     MSource::Z2::Par z2Par;
     z2Par.tA = 0;
     z2Par.tB = 0;
     application.createModule<MSource::Z2>("z2", z2Par);
+    
+    MSource::LaplacianSmear::Par lapPar;
+    lapPar.gauge = "gauge";
+    lapPar.source = "z2";
+    lapPar.alpha = 0.1;
+    lapPar.n = 3;
+    lapPar.spatial = true; // 3d smearing 
+    application.createModule<MSource::LaplacianSmear>("lap", lapPar);
+    
     // MSource::Point::Par ptPar;
     // ptPar.position = "0 0 0 0";
     // application.createModule<MSource::Point>("pt", ptPar);
@@ -105,6 +115,8 @@ int main(int argc, char *argv[])
         // application.createModule<MFermion::GaugeProp>("Qpt_" + flavour[i], quarkPar);
         quarkPar.source = "z2";
         application.createModule<MFermion::GaugeProp>("QZ2_" + flavour[i], quarkPar);
+        quarkPar.source = "lap";
+        application.createModule<MFermion::GaugeProp>("Qlap_" + flavour[i], quarkPar);
     }
     for (unsigned int i = 0; i < flavour.size(); ++i)
     for (unsigned int j = i; j < flavour.size(); ++j)
@@ -120,11 +132,11 @@ int main(int argc, char *argv[])
         //                                               + flavour[i] + flavour[j],
         //                                               mesPar);
         mesPar.output  = "mesons/Z2_" + flavour[i] + flavour[j];
-        mesPar.q1      = "QZ2_" + flavour[i];
-        mesPar.q2      = "QZ2_" + flavour[j];
+        mesPar.q1      = "Qlap_" + flavour[i];
+        mesPar.q2      = "Qlap_" + flavour[j];
         mesPar.gammas  = "all";
         mesPar.sink    = "sink";
-        application.createModule<MContraction::Meson>("meson_Z2_"
+        application.createModule<MContraction::Meson>("meson_lap_"
                                                       + flavour[i] + flavour[j],
                                                       mesPar);
     }

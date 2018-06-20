@@ -36,29 +36,26 @@ namespace QCD
 {
 
 ////////////////////////////////////////////////////////////
-// Laplacian operator L on fermion fields
+// Laplacian operator L on fields in the fundamental rep
 //
-// phi: fermion field
+// phi: field in the fundamental rep
 //
-// L phi(x) = Sum_mu [ U_mu(x) phi(x+mu) + U_mu(x-mu) phi(x-mu) - 2phi(x)]
+// L phi(x) = Sum_mu [ U_mu(x) phi(x+mu) + U_mu(x-mu) phi(x-mu) - 2ND phi(x)]
 //
 // Operator designed to be encapsulated by
 // an HermitianLinearOperator<.. , ..>
 ////////////////////////////////////////////////////////////
 
-// has to inherit from a fermion implementation
+// has to inherit from an implementation
 template <class Impl>
-class LaplacianFermions
+class LaplacianFundamental
 {
 public:
   INHERIT_IMPL_TYPES(Impl);
 
   // add a bool to smear only in the spatial directions
-  LaplacianFermions(GridBase *grid, bool spatial = false)
+  LaplacianFundamental(GridBase *grid, bool spatial = false)
     : U(Nd, grid), spatial_laplacian(spatial){};
-  
-  void Mdir(const FermionField &, FermionField &, int, int) { assert(0); }
-  void Mdiag(const FermionField &, FermionField &) { assert(0); }
   
   void ImportGauge(const GaugeField &_U)
   {
