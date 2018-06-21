@@ -133,6 +133,8 @@ void TLaplacianSmear<FImpl>::execute(void)
     auto        &src          = envGet(PropagatorField, par().source);
     auto        &smeared_src  = envGet(PropagatorField, getName());
 
+    double coeff = par().alpha / (double)(par().n);
+
     envGetTmp(FermionField, tmp);
     envGetTmp(FermionField, src_sc);
 
@@ -146,7 +148,7 @@ void TLaplacianSmear<FImpl>::execute(void)
         PropToFerm<FImpl>(src_sc, src, s, c);
         for (uint n = 0; n < par().n; n++){
             lapl.M(src_sc, tmp );
-            src_sc += par().alpha * tmp; 
+            src_sc += coeff * tmp; 
         }
         FermToProp<FImpl>(smeared_src, src_sc, s, c);
       }
