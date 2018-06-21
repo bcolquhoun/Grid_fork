@@ -46,7 +46,6 @@
 #include <Grid/Hadrons/Modules/MAction/MobiusDWF.hpp>
 #include <Grid/Hadrons/Modules/MAction/WilsonClover.hpp>
 #include <Grid/Hadrons/Modules/MAction/Wilson.hpp>
-<<<<<<< HEAD
 #include <Grid/Hadrons/Modules/MAction/ZMobiusDWF.hpp>
 #include <Grid/Hadrons/Modules/MGauge/StochEm.hpp>
 #include <Grid/Hadrons/Modules/MGauge/UnitEm.hpp>
@@ -56,18 +55,3 @@
 #include <Grid/Hadrons/Modules/MGauge/LoadSmear.hpp>
 #include <Grid/Hadrons/Modules/MSink/Point.hpp>
 #include <Grid/Hadrons/Modules/MSink/Smear.hpp>
-=======
-#include <Grid/Hadrons/Modules/MLoop/NoiseLoop.hpp>
-#include <Grid/Hadrons/Modules/MSource/Wall.hpp>
-#include <Grid/Hadrons/Modules/MSource/FermionSmear.hpp>
-#include <Grid/Hadrons/Modules/MSource/Z2.hpp>
-#include <Grid/Hadrons/Modules/MSource/SeqConserved.hpp>
-#include <Grid/Hadrons/Modules/MSource/Point.hpp>
-#include <Grid/Hadrons/Modules/MSource/SeqGamma.hpp>
-#include <Grid/Hadrons/Modules/MFermion/FreeProp.hpp>
-#include <Grid/Hadrons/Modules/MFermion/GaugeProp.hpp>
-#include <Grid/Hadrons/Modules/MUtilities/TestSeqConserved.hpp>
-#include <Grid/Hadrons/Modules/MUtilities/TestSeqGamma.hpp>
-#include <Grid/Hadrons/Modules/MSolver/RBPrecCG.hpp>
-#include <Grid/Hadrons/Modules/MSolver/LocalCoherenceLanczos.hpp>
->>>>>>> ce3b557f7874d384560fd1682ce65e5978b01e61

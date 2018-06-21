@@ -15,7 +15,6 @@ modules_cc =\
   Modules/MContraction/DiscLoop.cc \
   Modules/MContraction/WeakNeutral4ptDisc.cc \
   Modules/MContraction/WeakHamiltonianEye.cc \
-<<<<<<< HEAD
   Modules/MContraction/Gamma3pt.cc \
   Modules/MScalarSUN/ShiftProbe.cc \
   Modules/MScalarSUN/TransProj.cc \
@@ -29,34 +28,6 @@ modules_cc =\
   Modules/MScalarSUN/TrMag.cc \
   Modules/MScalarSUN/Grad.cc \
   Modules/MScalarSUN/StochFreeField.cc \
-=======
-  Modules/MContraction/WeakHamiltonianNonEye.cc \
-  Modules/MContraction/Meson.cc \
-  Modules/MGauge/StochEm.cc \
-  Modules/MGauge/UnitEm.cc \
-  Modules/MGauge/LoadSmear.cc \
-  Modules/MGauge/Random.cc \
-  Modules/MGauge/Unit.cc \
-  Modules/MGauge/FundtoHirep.cc \
-  Modules/MSink/Smear.cc \
-  Modules/MSink/Point.cc \
-  Modules/MScalar/VPCounterTerms.cc \
-  Modules/MScalar/FreeProp.cc \
-  Modules/MScalar/ScalarVP.cc \
-  Modules/MScalar/ChargedProp.cc \
-  Modules/MIO/LoadEigenPack.cc \
-  Modules/MIO/LoadCoarseEigenPack.cc \
-  Modules/MIO/LoadNersc.cc \
-  Modules/MIO/LoadBinary.cc \
-  Modules/MAction/ZMobiusDWF.cc \
-  Modules/MAction/DWF.cc \
-  Modules/MAction/WilsonClover.cc \
-  Modules/MAction/MobiusDWF.cc \
-  Modules/MAction/Wilson.cc \
-  Modules/MLoop/NoiseLoop.cc \
-  Modules/MSource/FermionSmear.cc \
-  Modules/MSource/Z2.cc \
->>>>>>> ce3b557f7874d384560fd1682ce65e5978b01e61
   Modules/MSource/Wall.cc \
   Modules/MSource/SeqGamma.cc \
   Modules/MSource/LaplacianSmear.cc \
@@ -132,7 +103,6 @@ modules_hpp =\
   Modules/MAction/MobiusDWF.hpp \
   Modules/MAction/WilsonClover.hpp \
   Modules/MAction/Wilson.hpp \
-<<<<<<< HEAD
   Modules/MAction/ZMobiusDWF.hpp \
   Modules/MGauge/StochEm.hpp \
   Modules/MGauge/UnitEm.hpp \
@@ -142,19 +112,4 @@ modules_hpp =\
   Modules/MGauge/LoadSmear.hpp \
   Modules/MSink/Point.hpp \
   Modules/MSink/Smear.hpp
-=======
-  Modules/MLoop/NoiseLoop.hpp \
-  Modules/MSource/Wall.hpp \
-  Modules/MSource/FermionSmear.hpp \
-  Modules/MSource/Z2.hpp \
-  Modules/MSource/SeqConserved.hpp \
-  Modules/MSource/Point.hpp \
-  Modules/MSource/SeqGamma.hpp \
-  Modules/MFermion/FreeProp.hpp \
-  Modules/MFermion/GaugeProp.hpp \
-  Modules/MUtilities/TestSeqConserved.hpp \
-  Modules/MUtilities/TestSeqGamma.hpp \
-  Modules/MSolver/RBPrecCG.hpp \
-  Modules/MSolver/LocalCoherenceLanczos.hpp
->>>>>>> ce3b557f7874d384560fd1682ce65e5978b01e61
 

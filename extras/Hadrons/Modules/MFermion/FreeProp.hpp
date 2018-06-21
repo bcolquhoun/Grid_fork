@@ -152,7 +152,7 @@ void TFreeProp<FImpl>::execute(void)
             else
             {
                 PropToFerm<FImpl>(tmp, fullSrc, s, c);
-                make_5D(tmp, source, Ls_);
+                mat.ImportPhysicalFermionSource(tmp, source);
             }
         }
         // source conversion for 5D sources
@@ -176,7 +176,7 @@ void TFreeProp<FImpl>::execute(void)
         if (Ls_ > 1)
         {
             PropagatorField &p4d = envGet(PropagatorField, getName());
-            make_4D(sol, tmp, Ls_);
+            mat.ExportPhysicalFermionSolution(sol, tmp);
             FermToProp<FImpl>(p4d, tmp, s, c);
         }
     }

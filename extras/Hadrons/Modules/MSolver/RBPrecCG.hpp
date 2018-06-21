@@ -45,7 +45,6 @@ class RBPrecCGPar: Serializable
 {
 public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(RBPrecCGPar ,
-                                    std::string , action,
                                     unsigned int, maxIteration,
                                     double      , residual,
                                     std::string , eigenPack);
@@ -103,7 +102,7 @@ std::vector<std::string> TRBPrecCG<FImpl, nBasis>::getInput(void)
 template <typename FImpl, int nBasis>
 std::vector<std::string> TRBPrecCG<FImpl, nBasis>::getReference(void)
 {
-    std::vector<std::string> ref = {par().action};
+    std::vector<std::string> ref = {};
     
     if (!par().eigenPack.empty())
     {
@@ -130,13 +129,11 @@ void TRBPrecCG<FImpl, nBasis>::setup(void)
         HADRONS_ERROR(Argument, "zero maximum iteration");
     }
 
-    LOG(Message) << "setting up Schur red-black preconditioned CG for"
-                 << " action '" << par().action << "' with residual "
+    LOG(Message) << "setting up Schur red-black preconditioned CG "
+                 << "with residual "
                  << par().residual << ", maximum iteration " 
                  << par().maxIteration << std::endl;
 
-    auto        Ls          = env().getObjectLs(par().action);
-    auto        &mat        = envGet(FMat, par().action);
     std::string guesserName = getName() + "_guesser";
     GuesserPt   guesser{nullptr};
 
@@ -166,7 +163,7 @@ void TRBPrecCG<FImpl, nBasis>::setup(void)
             guesser.reset(new FineGuesser(epack.evec, epack.eval));
         }
     }
-    auto solver = [&mat, guesser, this](FermionField &sol, 
+    auto solver = [guesser, this](FMat &mat, FermionField &sol, 
                                         const FermionField &source)
     {
         ConjugateGradient<FermionField>           cg(par().residual, 
@@ -175,7 +172,7 @@ void TRBPrecCG<FImpl, nBasis>::setup(void)
         
         schurSolver(mat, source, sol, *guesser);
     };
-    envCreate(SolverFn, getName(), Ls, solver);
+    envCreate(SolverFn, getName(), 1, solver);
 }
 
 

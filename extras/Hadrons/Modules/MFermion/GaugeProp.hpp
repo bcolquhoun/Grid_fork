@@ -39,27 +39,6 @@ See the full license in the file "LICENSE" in the top level distribution directo
 BEGIN_HADRONS_NAMESPACE
 
 /******************************************************************************
- * 5D -> 4D and 4D -> 5D conversions.                                         *
- ******************************************************************************/
-template<class vobj> // Note that 5D object is modified.
-inline void make_4D(Lattice<vobj> &in_5d, Lattice<vobj> &out_4d, int Ls)
-{
-    axpby_ssp_pminus(in_5d, 0., in_5d, 1., in_5d, 0, 0);
-    axpby_ssp_pplus(in_5d, 1., in_5d, 1., in_5d, 0, Ls-1);
-    ExtractSlice(out_4d, in_5d, 0, 0);
-}
-
-template<class vobj>
-inline void make_5D(Lattice<vobj> &in_4d, Lattice<vobj> &out_5d, int Ls)
-{
-    out_5d = zero;
-    InsertSlice(in_4d, out_5d, 0, 0);
-    InsertSlice(in_4d, out_5d, Ls-1, 0);
-    axpby_ssp_pplus(out_5d, 0., out_5d, 1., out_5d, 0, 0);
-    axpby_ssp_pminus(out_5d, 0., out_5d, 1., out_5d, Ls-1, Ls-1);
-}
-
-/******************************************************************************
  *                                GaugeProp                                   *
  ******************************************************************************/
 BEGIN_MODULE_NAMESPACE(MFermion)
@@ -68,6 +47,7 @@ class GaugePropPar: Serializable
 {
 public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(GaugePropPar,
+                                    std::string, action,
                                     std::string, source,
                                     std::string, solver);
 };
@@ -109,7 +89,7 @@ TGaugeProp<FImpl>::TGaugeProp(const std::string name)
 template <typename FImpl>
 std::vector<std::string> TGaugeProp<FImpl>::getInput(void)
 {
-    std::vector<std::string> in = {par().source, par().solver};
+    std::vector<std::string> in = {par().action, par().source, par().solver};
     
     return in;
 }
@@ -126,7 +106,7 @@ std::vector<std::string> TGaugeProp<FImpl>::getOutput(void)
 template <typename FImpl>
 void TGaugeProp<FImpl>::setup(void)
 {
-    Ls_ = env().getObjectLs(par().solver);
+    Ls_ = env().getObjectLs(par().action);
     envCreateLat(PropagatorField, getName());
     envTmpLat(FermionField, "source", Ls_);
     envTmpLat(FermionField, "sol", Ls_);
@@ -142,13 +122,14 @@ template <typename FImpl>
 void TGaugeProp<FImpl>::execute(void)
 {
     LOG(Message) << "Computing quark propagator '" << getName() << "'"
-                 << std::endl;
+                 << " using action '" << par().action << "'" << std::endl;
     
     std::string propName = (Ls_ == 1) ? getName() : (getName() + "_5d");
     auto        &prop    = envGet(PropagatorField, propName);
     auto        &fullSrc = envGet(PropagatorField, par().source);
     auto        &solver  = envGet(SolverFn, par().solver);
-    
+    auto        &mat     = envGet(FMat, par().action);
+
     envGetTmp(FermionField, source);
     envGetTmp(FermionField, sol);
     envGetTmp(FermionField, tmp);
@@ -169,7 +150,7 @@ void TGaugeProp<FImpl>::execute(void)
             else
             {
                 PropToFerm<FImpl>(tmp, fullSrc, s, c);
-                make_5D(tmp, source, Ls_);
+                mat.ImportPhysicalFermionSource(tmp, source);
             }
         }
         // source conversion for 5D sources
@@ -185,13 +166,13 @@ void TGaugeProp<FImpl>::execute(void)
             }
         }
         sol = zero;
-        solver(sol, source);
+        solver(mat, sol, source);
         FermToProp<FImpl>(prop, sol, s, c);
         // create 4D propagators from 5D one if necessary
         if (Ls_ > 1)
         {
             PropagatorField &p4d = envGet(PropagatorField, getName());
-            make_4D(sol, tmp, Ls_);
+            mat.ExportPhysicalFermionSolution(sol, tmp);
             FermToProp<FImpl>(p4d, tmp, s, c);
         }
     }

@@ -93,7 +93,7 @@ typedef typename SImpl::Field ScalarField##suffix;\
 typedef typename SImpl::Field PropagatorField##suffix;
 
 #define SOLVER_TYPE_ALIASES(FImpl, suffix)\
-typedef std::function<void(FermionField##suffix &,\
+typedef std::function<void(FMat##suffix &, FermionField##suffix &,\
                       const FermionField##suffix &)> SolverFn##suffix;
 
 #define SINK_TYPE_ALIASES(suffix)\

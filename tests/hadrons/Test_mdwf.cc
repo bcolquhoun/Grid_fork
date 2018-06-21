@@ -96,20 +96,20 @@ int main(int argc, char *argv[])
         actionPar.Ls    = 12;
         actionPar.M5    = 1.0;
         actionPar.mass  = mass[i];
-	actionPar.scale = 2.0;
+	    actionPar.scale = 2.0;
         actionPar.boundary = boundary;
         application.createModule<MAction::MobiusDWF>("DWF_" + flavour[i], actionPar);
         
         // solvers
         MSolver::RBPrecCG::Par solverPar;
-        solverPar.action       = "DWF_" + flavour[i];
+        //solverPar.action       = "DWF_" + flavour[i];
         solverPar.residual     = tol[i];
         solverPar.maxIteration = 10000;
-        application.createModule<MSolver::RBPrecCG>("CG_" + flavour[i],
-                                                    solverPar);
+        application.createModule<MSolver::RBPrecCG>("CG_" + flavour[i], solverPar);
         
         // propagators
         MFermion::GaugeProp::Par quarkPar;
+        quarkPar.action = "DWF_" + flavour[i];
         quarkPar.solver = "CG_" + flavour[i];
         // quarkPar.source = "pt";
         // application.createModule<MFermion::GaugeProp>("Qpt_" + flavour[i], quarkPar);
