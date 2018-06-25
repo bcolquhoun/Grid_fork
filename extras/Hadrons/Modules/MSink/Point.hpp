@@ -134,7 +134,7 @@ void TPoint<FImpl>::execute(void)
             LatticeCoordinate(coor, mu);
             ph = ph + (p[mu]/env().getGrid()->_fdimensions[mu])*coor;
         }
-        ph = exp((Real)(2*M_PI)*i*ph);
+        ph = exp((Real)(2*M_PI)*-i*ph);
         hasPhase_ = true;
     }
     auto sink = [&ph](const PropagatorField &field)
