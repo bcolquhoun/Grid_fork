@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
     Application              application;
     std::vector<std::string> flavour = {"b"};
     std::vector<double>      mass    = {.68808  };
+    std::vector<double>      lmass   = {.5  };
     unsigned int             nt      = GridDefaultLatt()[Tp];
     
     // global parameters
@@ -73,7 +74,7 @@ int main(int argc, char *argv[])
 
     // sink
     MSink::Point::Par sinkPar;
-    sinkPar.mom = "-1 1 0";
+    sinkPar.mom = "1. -1. 0.";
     application.createModule<MSink::ScalarPoint>("sink", sinkPar);
     for (unsigned int i = 0; i < flavour.size(); ++i)
     {
@@ -86,10 +87,19 @@ int main(int argc, char *argv[])
 	actionPar.scale = 2.0;
         actionPar.boundary = boundary;
         application.createModule<MAction::MobiusDWF>("MobiusDWF_" + flavour[i], actionPar);
+
+        // actions
+        MAction::MobiusDWF::Par actionPar_light;
+        actionPar_light.gauge = "gauge";
+        actionPar_light.Ls    = 12;
+        actionPar_light.M5    = 1.0;
+        actionPar_light.mass  = lmass[i];
+	actionPar_light.scale = 2.0;
+        actionPar_light.boundary = boundary;
+        application.createModule<MAction::MobiusDWF>("MobiusDWF_light_" + flavour[i], actionPar_light);
         
         // solvers
         MSolver::RBPrecCG::Par solverPar;
-        //solverPar.action       = "MobiusDWF_" + flavour[i];
         solverPar.residual     = 1.0e-16;
         solverPar.maxIteration = 10000;
         application.createModule<MSolver::RBPrecCG>("CG_" + flavour[i],
@@ -98,11 +108,11 @@ int main(int argc, char *argv[])
     for (unsigned int t = 0; t < 1; t += 1)
     {
         std::string                           srcName;
-	std::vector<std::string>              smrSrcName;
-	std::vector<std::string>              smrSnkName;
+	std::string                           smrSrcName;
+	std::string                           smrSnkName;
         std::vector<std::string>              qName;
+	std::string                           ptName;
         std::vector<std::vector<std::string>> seqName;
-	//std::vector<std::string>              seqName;
 
 	// Point Source
 	MSource::Point::Par pointPar;
@@ -110,14 +120,18 @@ int main(int argc, char *argv[])
 	srcName = "pt_" + std::to_string(t);
 	application.createModule<MSource::Point>(srcName, pointPar);
 
-	// MSource::LaplacianSmear::Par lapPar;
-	// lapPar.gauge = "gauge";
-	// lapPar.source = srcName;
-	// lapPar.alpha = 20.;
-	// lapPar.n = 200;
-	// lapPar.spatial = true;
-	// smrSrcName.push_back("smrSrc_" + std::to_string(t));
-	// application.createModule<MSource::LaplacianSmear>(smrSrcName[t],lapPar);
+
+	// Set up quark smearing parameters
+	MSource::LaplacianSmear::Par lapPar;
+	lapPar.gauge = "gauge";
+	lapPar.source = srcName;
+	lapPar.alpha = 20.;
+	lapPar.n = 200;
+	lapPar.spatial = true;
+	
+	// smear source
+	smrSrcName = "smrSrc_" + std::to_string(t) ;
+	application.createModule<MSource::LaplacianSmear>(smrSrcName,lapPar);
         
         // Z2 source
         // MSource::Z2::Par z2Par;
@@ -125,98 +139,120 @@ int main(int argc, char *argv[])
         // z2Par.tB = t;
         // srcName  = "z2_" + std::to_string(t);
         // application.createModule<MSource::Z2>(srcName, z2Par);
+
+
         for (unsigned int i = 0; i < flavour.size(); ++i)
         {
-            // sequential sources
-            MSource::SeqGamma::Par seqPar;
-            //qName.push_back("QZ2_" + flavour[i] + "_" + std::to_string(t));
-	    qName.push_back("Qpt_" + flavour[i] + "_" + std::to_string(t));
-            seqPar.q   = qName[i];
-            seqPar.tA  = 28 % nt;//(t + nt/4) % nt;
-            seqPar.tB  = 28 % nt;//(t + nt/4) % nt;
-            seqPar.mom = "1. -1. 0. 0.";
-            seqName.push_back(std::vector<std::string>(Nd));
-            for (unsigned int mu = 0; mu < Nd; ++mu)
+	  
+	  // propagators
+	  MFermion::GaugeProp::Par quarkPar;
+	  qName.push_back("Qpt_" + flavour[i] + "_" + std::to_string(t));
+	  // using light propagator action
+	  quarkPar.action = "MobiusDWF_light_" + flavour[i];
+	  quarkPar.solver = "CG_" + flavour[i];
+	  quarkPar.source = smrSrcName ;
+
+	  // propagator form smeared source
+	  application.createModule<MFermion::GaugeProp>(qName[i], quarkPar);
+	  ptName = "ptName";
+
+	  // smear propagator at sink
+	  lapPar.source = qName[i];
+	  smrSnkName = "smrSnk" ;
+	  application.createModule<MSource::LaplacianSmear>(smrSnkName,lapPar);
+	  
+	  // sequential sources
+	  MSource::SeqGamma::Par seqPar;
+	  // create from smeared-smeared propagator
+	  seqPar.q   = smrSnkName;
+	  seqPar.tA  = 28 % nt;
+	  seqPar.tB  = 28 % nt;
+	  seqPar.mom = "0. 0. 0. 0.";
+	  seqName.push_back(std::vector<std::string>(Nd));
+	  
+	  for (unsigned int mu = 0; mu < 1; ++mu)
             {
-	      seqPar.gamma   = 0x1 << mu;
-	      //seqPar.gamma = 1;
+	      // hex for gamma (0x0 is -gamma5 to agree with IroIro +gamma5)
+	      seqPar.gamma = 0x0; 
 	      seqName[i][mu] = "G" + std::to_string(seqPar.gamma)
 	    	+ "_" + std::to_string(seqPar.tA) + "-"
 	    	+ qName[i];
 	      application.createModule<MSource::SeqGamma>(seqName[i][mu], seqPar);
             }
-	    // seqPar.gamma = "all";
-	    // seqName.push_back("G" + std::to_string(seqPar.gamma)
-	    // 		      + "_" +std::to_string(seqPar.tA) + "-"
-	    // 		      + qName[i]);
-	    //application.createModule<MSource::SeqGamma>(seqName[i],seqPar);
-            
-            // propagators
-            MFermion::GaugeProp::Par quarkPar;
-	    quarkPar.action = "MobiusDWF_" + flavour[i];
-            quarkPar.solver = "CG_" + flavour[i];
-            quarkPar.source = srcName;
-            application.createModule<MFermion::GaugeProp>(qName[i], quarkPar);
-            for (unsigned int mu = 0; mu < Nd; ++mu)
+	  
+	  // create propagator from sequential source with heavier quark
+	  for (unsigned int mu = 0; mu < 1; ++mu)
             {
-                quarkPar.source = seqName[i][mu];
-                seqName[i][mu]  = "Q_" + flavour[i] + "-" + seqName[i][mu];
-                application.createModule<MFermion::GaugeProp>(seqName[i][mu], quarkPar);
+	      quarkPar.source = seqName[i][mu];
+	      quarkPar.action = "MobiusDWF_" + flavour[i] ;
+	      seqName[i][mu]  = "Q_" + flavour[i] + "-" + seqName[i][mu];
+	      application.createModule<MFermion::GaugeProp>(seqName[i][mu], quarkPar);
             }
-	    // quarkPar.source = seqName[i];
-	    // seqName[i] = "Q_" + flavour[i] + "-" + seqName[i];
-	    // application.createModule<MFermion::GaugeProp>(seqName[i],quarkPar);
-        }
 
-	// create smeared sink for each flavour
-	// for (unsigned int i = 0; i < flavour.size(); ++i)
-	//   {
-	//     lapPar.source = qName[i];
-	//     smrSnkName.push_back("smrSnk_" + std::to_string(t));
-	//     application.createModule<MSource::LaplacianSmear>(smrSnkName[i],lapPar);
-	//   }
-        
+	  // point propagator 
+	  quarkPar.action = "MobiusDWF_light_" + flavour[i] ;
+	  quarkPar.source =  srcName;
+	  application.createModule<MFermion::GaugeProp>(ptName, quarkPar);
+        }
+	        
         // contractions
         MContraction::Meson::Par mesPar;
         for (unsigned int i = 0; i < flavour.size(); ++i)
 	  {
 	    for (unsigned int j = i; j < flavour.size(); ++j)
 	      {
-		mesPar.output = "3pt/pt_" + flavour[i] + flavour[j];
-		mesPar.q1     = qName[i];
-		mesPar.q2     = qName[j];
+		// smeared-local meson
+		mesPar.output = "3pt/sl_" + flavour[i] + flavour[j];
+		mesPar.q2     = ptName;
+		mesPar.q1     = qName[j];
 		mesPar.gammas = "all";
 		mesPar.sink   = "sink";
-		application.createModule<MContraction::Meson>("meson_pt_"
+		application.createModule<MContraction::Meson>("meson_sl_"
 							      + std::to_string(t)
 							      + "_"
 							      + flavour[i]
 							      + flavour[j],
 							      mesPar);
+
+		// smeared-smeared meson
+		mesPar.output = "3pt/ss_" + flavour[i] + flavour[j];
+		mesPar.q1     = smrSnkName;
+		mesPar.q2     = ptName;
+		mesPar.gammas = "all";
+		mesPar.sink   = "sink";
+		application.createModule<MContraction::Meson>("meson_ss_"
+							      + std::to_string(t)
+							      + "_"
+							      + flavour[i]
+							      + flavour[j],
+							      mesPar);
+
+
 	      }
 	  }
+
 	for (unsigned int i = 0; i < flavour.size(); ++i)
 	  {
-	  for (unsigned int j = 0; j < flavour.size(); ++j)
-	    {
-	      for (unsigned int mu = 0; mu < Nd; ++mu)
-		{
-		  MContraction::Meson::Par mesPar;
-		  
-		  mesPar.output = "3pt/3pt_pt_" + flavour[i] + flavour[j] + "_"
-		    + std::to_string(mu);
-		  mesPar.q1     = qName[i];
-		  mesPar.q2     = seqName[j][mu];
-		  mesPar.gammas = "all";
-		  mesPar.sink   = "sink";
-		  application.createModule<MContraction::Meson>("3pt_pt_"
-								+ std::to_string(t)
+	    for (unsigned int j = 0; j < flavour.size(); ++j)
+	      {
+		for (unsigned int mu = 0; mu < 1; ++mu)
+		  {
+		    MContraction::Meson::Par mesPar;
+		    
+		    mesPar.output = "3pt/3pt_ss_" + flavour[i] + flavour[j] + "_"
+		      + std::to_string(mu);
+		    mesPar.q1     = seqName[j][mu];
+		    mesPar.q2     = ptName;
+		    mesPar.gammas = "all";
+		    mesPar.sink   = "sink";
+		    application.createModule<MContraction::Meson>("3pt_pt_"
+								  + std::to_string(t)
 								+ "_"
-								+ flavour[i]
-								+ flavour[j]
-								+ "_"
-								+ std::to_string(mu),
-								mesPar);
+								  + flavour[i]
+								  + flavour[j]
+								  + "_"
+								  + std::to_string(mu),
+								  mesPar);
 		}
 	    }
 	  }

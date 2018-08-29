@@ -55,6 +55,7 @@ int main(int argc, char *argv[])
     globalPar.trajCounter.step  = 20;
     globalPar.seed              = "1 2 3 4";
     application.setPar(globalPar);
+
     // gauge field
     MGauge::LoadSmear::Par LPar;
     LPar.file="myfile";
@@ -62,7 +63,6 @@ int main(int argc, char *argv[])
     LPar.rho=0.1;
     
     application.createModule<MGauge::LoadSmear>("gauge",LPar);
-    //application.createModule<MGauge::Random>("gauge");
     
     MSource::Point::Par ptPar;
     ptPar.position = "0 0 0 0";
@@ -82,12 +82,9 @@ int main(int argc, char *argv[])
     lapPar.spatial = true; // 3d smearing 
     application.createModule<MSource::LaplacianSmear>("lap", lapPar);
     
-    // MSource::Point::Par ptPar;
-    // ptPar.position = "0 0 0 0";
-    // application.createModule<MSource::Point>("pt", ptPar);
     // sink
     MSink::Point::Par sinkPar;
-    sinkPar.mom = "1 1 1";
+    sinkPar.mom = "0 0 0";
     application.createModule<MSink::ScalarPoint>("sink", sinkPar);
     
     // set fermion boundary conditions to be periodic space, antiperiodic time.
@@ -116,13 +113,19 @@ int main(int argc, char *argv[])
         MFermion::GaugeProp::Par quarkPar;
         quarkPar.action = "DWF_" + flavour[i];
         quarkPar.solver = "CG_" + flavour[i];
+
         quarkPar.source = "pt";
         application.createModule<MFermion::GaugeProp>("Qpt_" + flavour[i], quarkPar);
-        // quarkPar.source = "z2";
-        // application.createModule<MFermion::GaugeProp>("QZ2_" + flavour[i], quarkPar);
+
         quarkPar.source = "lap";
         application.createModule<MFermion::GaugeProp>("Qlap_" + flavour[i], quarkPar);
+
+	// sink smearing: simply apply smearing to solved propagator
+	lapPar.source = "Qlap_" + flavour[i] ;
+	application.createModule<MSource::LaplacianSmear>("Qsm_"+flavour[i], lapPar);
     }
+
+
     for (unsigned int i = 0; i < flavour.size(); ++i)
     for (unsigned int j = i; j < flavour.size(); ++j)
     {
@@ -133,31 +136,20 @@ int main(int argc, char *argv[])
         mesPar.q1      = "Qlap_" + flavour[j];
         mesPar.gammas  = "all";
         mesPar.sink    = "sink";
-        application.createModule<MContraction::Meson>("meson_pt_"
+        application.createModule<MContraction::Meson>("meson_sl_"
                                                       + flavour[i] + flavour[j],
                                                       mesPar);
-        // mesPar.output  = "mesons/Z2_" + flavour[i] + flavour[j];
-        // mesPar.q1      = "Qlap_" + flavour[i];
-        // mesPar.q2      = "Qlap_" + flavour[j];
-        // mesPar.gammas  = "all";
-        // mesPar.sink    = "sink";
-        // application.createModule<MContraction::Meson>("meson_lap_"
-        //                                               + flavour[i] + flavour[j],
-        //                                               mesPar);
+
+        mesPar.output  = "mesons/ss_" + flavour[i] + flavour[j];
+        mesPar.q1      = "Qpt_" + flavour[i];
+        mesPar.q2      = "Qsm_" + flavour[j];
+        mesPar.gammas  = "all";
+        mesPar.sink    = "sink";
+        application.createModule<MContraction::Meson>("meson_ss_"
+                                                      + flavour[i] + flavour[j],
+                                                      mesPar);
+
     }
-    // for (unsigned int i = 0; i < flavour.size(); ++i)
-    // for (unsigned int j = i; j < flavour.size(); ++j)
-    // for (unsigned int k = j; k < flavour.size(); ++k)
-    // {
-    //     MContraction::Baryon::Par barPar;
-        
-    //     barPar.output = "baryons/pt_" + flavour[i] + flavour[j] + flavour[k];
-    //     barPar.q1     = "Qpt_" + flavour[i];
-    //     barPar.q2     = "Qpt_" + flavour[j];
-    //     barPar.q3     = "Qpt_" + flavour[k];
-    //     application.createModule<MContraction::Baryon>(
-    //         "baryon_pt_" + flavour[i] + flavour[j] + flavour[k], barPar);
-    // }
     
     // execution
     application.saveParameterFile("spectrum.xml");
