@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
     
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
-    std::vector<std::string> flavour = {"b"};
-    std::vector<double>      mass    = {.68808  };
-    std::vector<double>      lmass   = {.5  };
+    std::vector<std::string> flavour = {"l"};
+    //std::vector<double>      mass    = {0.015};
+    std::vector<double>      lmass   = {.015};
     unsigned int             nt      = GridDefaultLatt()[Tp];
     
     // global parameters
@@ -74,24 +74,24 @@ int main(int argc, char *argv[])
 
     // sink
     MSink::Point::Par sinkPar;
-    sinkPar.mom = "1. -1. 0.";
+    sinkPar.mom = "0. 0. 0.";
     application.createModule<MSink::ScalarPoint>("sink", sinkPar);
     for (unsigned int i = 0; i < flavour.size(); ++i)
     {
-        // actions
-        MAction::MobiusDWF::Par actionPar;
-        actionPar.gauge = "gauge";
-        actionPar.Ls    = 12;
-        actionPar.M5    = 1.0;
-        actionPar.mass  = mass[i];
-	actionPar.scale = 2.0;
-        actionPar.boundary = boundary;
-        application.createModule<MAction::MobiusDWF>("MobiusDWF_" + flavour[i], actionPar);
+        // // actions
+        // MAction::MobiusDWF::Par actionPar;
+        // actionPar.gauge = "gauge";
+        // actionPar.Ls    = 12;
+        // actionPar.M5    = 1.0;
+        // actionPar.mass  = mass[i];
+	// actionPar.scale = 2.0;
+        // actionPar.boundary = boundary;
+        // application.createModule<MAction::MobiusDWF>("MobiusDWF_" + flavour[i], actionPar);
 
         // actions
         MAction::MobiusDWF::Par actionPar_light;
         actionPar_light.gauge = "gauge";
-        actionPar_light.Ls    = 12;
+        actionPar_light.Ls    = 8;
         actionPar_light.M5    = 1.0;
         actionPar_light.mass  = lmass[i];
 	actionPar_light.scale = 2.0;
@@ -121,17 +121,17 @@ int main(int argc, char *argv[])
 	application.createModule<MSource::Point>(srcName, pointPar);
 
 
-	// Set up quark smearing parameters
-	MSource::LaplacianSmear::Par lapPar;
-	lapPar.gauge = "gauge";
-	lapPar.source = srcName;
-	lapPar.alpha = 20.;
-	lapPar.n = 200;
-	lapPar.spatial = true;
+	// // Set up quark smearing parameters
+	// MSource::LaplacianSmear::Par lapPar;
+	// lapPar.gauge = "gauge";
+	// lapPar.source = srcName;
+	// lapPar.alpha = 20.;
+	// lapPar.n = 200;
+	// lapPar.spatial = true;
 	
-	// smear source
-	smrSrcName = "smrSrc_" + std::to_string(t) ;
-	application.createModule<MSource::LaplacianSmear>(smrSrcName,lapPar);
+	// // smear source
+	// smrSrcName = "smrSrc_" + std::to_string(t) ;
+	// application.createModule<MSource::LaplacianSmear>(smrSrcName,lapPar);
         
         // Z2 source
         // MSource::Z2::Par z2Par;
@@ -150,16 +150,16 @@ int main(int argc, char *argv[])
 	  // using light propagator action
 	  quarkPar.action = "MobiusDWF_light_" + flavour[i];
 	  quarkPar.solver = "CG_" + flavour[i];
-	  quarkPar.source = smrSrcName ;
+	  quarkPar.source = srcName ;
 
 	  // propagator form smeared source
 	  application.createModule<MFermion::GaugeProp>(qName[i], quarkPar);
 	  ptName = "ptName";
 
-	  // smear propagator at sink
-	  lapPar.source = qName[i];
-	  smrSnkName = "smrSnk" ;
-	  application.createModule<MSource::LaplacianSmear>(smrSnkName,lapPar);
+	  // // smear propagator at sink
+	  // lapPar.source = qName[i];
+	  // smrSnkName = "smrSnk" ;
+	  // application.createModule<MSource::LaplacianSmear>(smrSnkName,lapPar);
 	  
 	  // sequential sources
 	  MSource::SeqGamma::Par seqPar;

@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     // run setup ///////////////////////////////////////////////////////////////
     Application              application;
     std::vector<std::string> flavour = {"l"};
-    std::vector<double>      mass    = {.003  };
+    std::vector<double>      mass    = {.015  };
     std::vector<double>      tol     = {1e-11 };
     
     // global parameters
@@ -56,14 +56,14 @@ int main(int argc, char *argv[])
     globalPar.seed              = "1 2 3 4";
     application.setPar(globalPar);
 
-    //gauge field
-    MGauge::LoadSmear::Par LPar;
-    LPar.file="myfile";
-    LPar.Nsmear=3;
-    LPar.rho=0.1;
-   
-    application.createModule<MGauge::LoadSmear>("gauge",LPar);
-    //application.createModule<MGauge::Unit>("gauge");
+    // gauge field
+    // MGauge::LoadSmear::Par LPar;
+    // LPar.file="myfile";
+    // LPar.Nsmear=3;
+    // LPar.rho=0.1;
+    
+    //application.createModule<MGauge::LoadSmear>("gauge",LPar);
+    application.createModule<MGauge::Unit>("gauge");
     
     MSource::Point::Par ptPar;
     ptPar.position = "0 0 0 0";
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
         // actions
         MAction::MobiusDWF::Par actionPar;
         actionPar.gauge = "gauge";
-        actionPar.Ls    = 8; 
+        actionPar.Ls    = 12; 
         actionPar.M5    = 1.0;
         actionPar.mass  = mass[i];
 	actionPar.scale = 2.0;
@@ -130,16 +130,30 @@ int main(int argc, char *argv[])
     for (unsigned int i = 0; i < flavour.size(); ++i)
     for (unsigned int j = i; j < flavour.size(); ++j)
     {
-        MContraction::Meson::Par mesPar;
+        MContraction::WardIdentity::Par mesPar;
+	MContraction::Meson::Par mesParContract;
         
-        mesPar.output  = "mesons/pt_" + flavour[i] + flavour[j];
-        mesPar.q2      = "Qpt_" + flavour[i];
-        mesPar.q1      = "Qpt_" + flavour[j];
-        mesPar.gammas  = "all";
-        mesPar.sink    = "sink";
-        application.createModule<MContraction::Meson>("mesons_loc-loc_"
+        //mesPar.output  = "mesons/pt_" + flavour[i] + flavour[j];
+	mesPar.q      = "Qpt_" + flavour[i]+"_5d";
+	mesPar.action = "MDWF_" + flavour[i];
+	mesPar.mass = mass[i];
+	mesPar.test_axial = true;
+        //mesPar.q1      = "Qpt_" + flavour[j];
+        //mesPar.gammas  = "all";
+        //mesPar.sink    = "sink";
+        application.createModule<MContraction::WardIdentity>("meson_wi_"
                                                       + flavour[i] + flavour[j],
                                                       mesPar);
+
+
+        mesParContract.output  = "mesons/pt_" + flavour[i] + flavour[j];
+	mesParContract.q1      = "Qpt_" + flavour[i];
+	mesParContract.q2      = "Qpt_" + flavour[j];
+	mesParContract.gammas = "all";
+	mesParContract.sink = "sink";
+        application.createModule<MContraction::Meson>("meson_ll_"
+                                                      + flavour[i] + flavour[j],
+                                                      mesParContract);
 
         // mesPar.output  = "mesons/ss_" + flavour[i] + flavour[j];
         // mesPar.q1      = "Qpt_" + flavour[i];
